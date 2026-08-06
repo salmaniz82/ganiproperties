@@ -1,0 +1,38 @@
+{
+  "id": "request",
+  "name": "Request form",
+  "schema": {
+    "eyebrow": {
+      "type": "text",
+      "label": "Eyebrow"
+    },
+    "title": {
+      "type": "text",
+      "label": "Title"
+    },
+    "highlight": {
+      "type": "text",
+      "label": "Highlight"
+    },
+    "intro": {
+      "type": "textarea",
+      "label": "Intro"
+    },
+    "phone": {
+      "type": "text",
+      "label": "Phone"
+    },
+    "email": {
+      "type": "text",
+      "label": "Email"
+    },
+    "address": {
+      "type": "textarea",
+      "label": "Address"
+    },
+    "button": {
+      "type": "text",
+      "label": "Button"
+    }
+  }
+}

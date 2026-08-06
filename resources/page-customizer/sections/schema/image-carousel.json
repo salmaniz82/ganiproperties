@@ -1,0 +1,43 @@
+{
+  "id": "image-carousel",
+  "name": "Image carousel",
+  "schema": {
+    "slides": {
+      "type": "array",
+      "label": "Slides",
+      "item": {
+        "title": {
+          "type": "text",
+          "label": "Title"
+        },
+        "heading": {
+          "type": "text",
+          "label": "Heading"
+        },
+        "background_image": {
+          "type": "image",
+          "label": "Background image"
+        }
+      }
+    }
+  },
+  "presets": {
+    "slides": [
+      {
+        "title": "London arrivals",
+        "heading": "A calmer way to land, stay and move through the city.",
+        "background_image": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1800&q=80"
+      },
+      {
+        "title": "Private coordination",
+        "heading": "Transfers, residences and requests handled through one trusted contact.",
+        "background_image": "https://images.unsplash.com/photo-1486299267070-83823f5448dd?auto=format&fit=crop&w=1800&q=80"
+      },
+      {
+        "title": "Everyday discretion",
+        "heading": "Quiet support for the details that make travel feel effortless.",
+        "background_image": "https://images.unsplash.com/photo-1520986606214-8b456906c813?auto=format&fit=crop&w=1800&q=80"
+      }
+    ]
+  }
+}

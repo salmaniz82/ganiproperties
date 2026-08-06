@@ -1,0 +1,51 @@
+{
+  "id": "faq",
+  "name": "FAQ",
+  "schema": {
+    "eyebrow": {
+      "type": "text",
+      "label": "Eyebrow"
+    },
+    "title": {
+      "type": "text",
+      "label": "Title"
+    },
+    "highlight": {
+      "type": "text",
+      "label": "Highlight"
+    },
+    "items": {
+      "type": "array",
+      "label": "Questions",
+      "item": {
+        "question": {
+          "type": "text",
+          "label": "Question"
+        },
+        "answer": {
+          "type": "textarea",
+          "label": "Answer"
+        }
+      }
+    }
+  },
+  "presets": {
+    "eyebrow": "FAQ",
+    "title": "Common questions,",
+    "highlight": "answered plainly.",
+    "items": [
+      {
+        "question": "How quickly can you arrange a transfer?",
+        "answer": "For standard London airport transfers, we can often coordinate options the same day, subject to supplier availability and timing."
+      },
+      {
+        "question": "Do I pay suppliers directly?",
+        "answer": "Yes. We keep invoicing transparent: one payment link is for our service fee, and supplier costs are paid directly to the supplier where possible."
+      },
+      {
+        "question": "Can you support longer stays?",
+        "answer": "Yes. We can coordinate accommodation, transport, vehicle care, bookings and practical support for short visits or longer stays."
+      }
+    ]
+  }
+}

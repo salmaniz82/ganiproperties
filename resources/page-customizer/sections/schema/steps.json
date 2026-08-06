@@ -1,0 +1,40 @@
+{
+  "id": "steps",
+  "name": "How it works",
+  "schema": {
+    "eyebrow": {
+      "type": "text",
+      "label": "Eyebrow"
+    },
+    "title": {
+      "type": "text",
+      "label": "Title"
+    },
+    "highlight": {
+      "type": "text",
+      "label": "Highlight"
+    },
+    "cta": {
+      "type": "text",
+      "label": "CTA"
+    },
+    "items": {
+      "type": "array",
+      "label": "Steps",
+      "item": {
+        "number": {
+          "type": "text",
+          "label": "Number"
+        },
+        "title": {
+          "type": "text",
+          "label": "Title"
+        },
+        "text": {
+          "type": "textarea",
+          "label": "Text"
+        }
+      }
+    }
+  }
+}

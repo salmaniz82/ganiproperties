@@ -1,0 +1,30 @@
+{
+  "id": "about",
+  "name": "About",
+  "schema": {
+    "eyebrow": {
+      "type": "text",
+      "label": "Eyebrow"
+    },
+    "title": {
+      "type": "text",
+      "label": "Title"
+    },
+    "highlight": {
+      "type": "text",
+      "label": "Highlight"
+    },
+    "body": {
+      "type": "textarea",
+      "label": "Body"
+    },
+    "serve_title": {
+      "type": "text",
+      "label": "Serve title"
+    },
+    "serve_items": {
+      "type": "textarea",
+      "label": "Serve items, one per line"
+    }
+  }
+}

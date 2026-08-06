@@ -1,0 +1,4 @@
+@extends('layouts.store') @section('title','Track Order') @section('content')
+<section class="section narrow"><div class="panel"><h1>Track your order</h1><form method="post" class="stack">@csrf<label>Order number<input name="number" value="{{ request('number') }}" required></label><label>Phone number or email<input name="identity" required></label><button class="button">Track order</button></form></div>
+@if(request()->isMethod('post'))<div class="panel order-track">@if($order)<small>{{ $order->number }}</small><h2>{{ ucfirst($order->fulfillment_status) }}</h2><p>Order status: <b>{{ ucfirst($order->status) }}</b></p><p>Payment: <b>{{ ucfirst($order->payment_status) }}</b></p><p>Total: <b>PKR {{ number_format($order->total) }}</b></p>@else<p>No matching order was found.</p>@endif</div>@endif</section>
+@endsection

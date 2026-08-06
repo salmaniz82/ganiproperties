@@ -1,0 +1,38 @@
+{
+  "id": "testimonials",
+  "name": "Testimonials",
+  "schema": {
+    "items": {
+      "type": "array",
+      "label": "Testimonials",
+      "item": {
+        "name": {
+          "type": "text",
+          "label": "Name"
+        },
+        "designation": {
+          "type": "text",
+          "label": "Designation"
+        },
+        "review": {
+          "type": "textarea",
+          "label": "Review"
+        }
+      }
+    }
+  },
+  "presets": {
+    "items": [
+      {
+        "name": "A Mayfair resident",
+        "designation": "Private household",
+        "review": "Every request was handled quietly, quickly and with the kind of judgement that makes the whole trip easier."
+      },
+      {
+        "name": "Operations Director",
+        "designation": "International delegation",
+        "review": "Transfers, accommodation and changes were coordinated through one calm point of contact from arrival to departure."
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "header",
+  "name": "Header",
+  "schema": {
+    "brand_name": {
+      "type": "text",
+      "label": "Brand name"
+    },
+    "brand_location": {
+      "type": "text",
+      "label": "Brand location"
+    },
+    "button_label": {
+      "type": "text",
+      "label": "Button label"
+    },
+    "nav": {
+      "type": "array",
+      "label": "Navigation",
+      "item": {
+        "label": {
+          "type": "text",
+          "label": "Label"
+        },
+        "href": {
+          "type": "text",
+          "label": "Link"
+        }
+      }
+    }
+  }
+}

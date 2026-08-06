@@ -1,0 +1,22 @@
+{
+  "id": "contact",
+  "name": "Contact",
+  "schema": {
+    "eyebrow": {
+      "type": "text",
+      "label": "Eyebrow"
+    },
+    "title": {
+      "type": "text",
+      "label": "Title"
+    },
+    "highlight": {
+      "type": "text",
+      "label": "Highlight"
+    },
+    "text": {
+      "type": "textarea",
+      "label": "Text"
+    }
+  }
+}

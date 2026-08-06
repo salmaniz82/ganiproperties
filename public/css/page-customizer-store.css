@@ -1,0 +1,59 @@
+.page-customizer-content{--pc-pink:var(--pink);--pc-blue:var(--blue);--pc-ink:var(--ink);--pc-muted:var(--muted);--pc-border:var(--border);--pc-soft:var(--soft);background:#fff;color:var(--pc-ink);font-family:Poppins,Arial,sans-serif}
+.page-customizer-content .container,.page-customizer-content .wide-grid{width:min(1400px,calc(100% - 48px));margin:0 auto}
+.page-customizer-content .section-pad{padding:54px 0}
+.page-customizer-content .eyebrow{margin:0 0 10px;color:var(--pc-pink);font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.page-customizer-content h1,.page-customizer-content h2{margin:0 0 14px;color:var(--pc-ink);font-family:Poppins,Arial,sans-serif;font-weight:900;letter-spacing:-.035em;line-height:1.05}
+.page-customizer-content h1{max-width:780px;font-size:clamp(38px,5vw,68px)}
+.page-customizer-content h2{font-size:clamp(28px,3.2vw,44px)}
+.page-customizer-content h1 em,.page-customizer-content h2 em{color:var(--pc-pink);font-style:normal}
+.page-customizer-content p{color:var(--pc-muted);font-size:14px;line-height:1.7}
+.page-customizer-content .lead,.page-customizer-content .section-copy,.page-customizer-content .request-intro{max-width:680px;font-size:16px}
+.page-customizer-content .button,.page-customizer-content .outline-button,.page-customizer-content .text-button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border-radius:8px;font-size:13px;font-weight:900;text-decoration:none}
+.page-customizer-content .button{border:0;background:var(--pc-pink);color:#fff;padding:0 20px}
+.page-customizer-content .outline-button,.page-customizer-content .text-button{color:var(--pc-pink);background:#fff;border:1px solid var(--pc-pink);padding:0 18px}
+.page-customizer-content .button-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.page-customizer-content .hero{position:relative;overflow:hidden;min-height:500px;display:grid;align-items:center;background:var(--pc-soft);border-bottom:1px solid var(--pc-border)}
+.page-customizer-content .hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,247,250,.98) 0%,rgba(255,247,250,.86) 44%,rgba(255,247,250,.22) 72%),var(--hero-image) center right/cover no-repeat}
+.page-customizer-content .hero-inner{position:relative;z-index:1;padding:60px 0}
+.page-customizer-content .feature-strip{margin-top:-34px;position:relative;z-index:2}
+.page-customizer-content .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.page-customizer-content .feature-grid article,.page-customizer-content .bordered-grid article,.page-customizer-content .testimonial-card,.page-customizer-content .faq-item,.page-customizer-content .contact-cards article{border:1px solid var(--pc-border);border-radius:12px;background:#fff;box-shadow:0 12px 28px rgba(232,72,132,.09)}
+.page-customizer-content .feature-grid article{display:flex;gap:14px;padding:18px}
+.page-customizer-content .card-number,.page-customizer-content .mini-number,.page-customizer-content .big-number{color:var(--pc-pink);font-weight:900}
+.page-customizer-content .feature-grid h3,.page-customizer-content .bordered-grid h3,.page-customizer-content .testimonial-card h3{margin:0 0 7px;font-size:16px}
+.page-customizer-content .feature-grid p,.page-customizer-content .bordered-grid p{margin:0}
+.page-customizer-content .bordered-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px}
+.page-customizer-content .bordered-grid article{padding:22px}
+.page-customizer-content .bordered-grid ul,.page-customizer-content .two-col{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.page-customizer-content .bordered-grid li,.page-customizer-content .two-col li{position:relative;padding-left:18px;color:var(--pc-ink);font-size:13px}
+.page-customizer-content .bordered-grid li:before,.page-customizer-content .two-col li:before{content:"";position:absolute;left:0;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--pc-pink)}
+.page-customizer-content .alt{background:#fff7fa}
+.page-customizer-content .step-grid{grid-template-columns:repeat(4,1fr)}
+.page-customizer-content .about-layout,.page-customizer-content .contact-layout,.page-customizer-content .request-layout{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.page-customizer-content .frame-art,.page-customizer-content .map-frame{min-height:300px;border-radius:18px;background:linear-gradient(135deg,#ffe4ec,#cfeefa);border:1px solid var(--pc-border)}
+.page-customizer-content .faq-list{display:grid;gap:12px;margin-top:22px}
+.page-customizer-content .faq-item{padding:0;overflow:hidden}
+.page-customizer-content .faq-question{width:100%;display:flex;justify-content:space-between;gap:14px;border:0;background:#fff;padding:17px 20px;color:var(--pc-ink);font:inherit;font-weight:900;cursor:pointer}
+.page-customizer-content .faq-answer{padding:0 20px 18px}
+.page-customizer-content .faq-item:not(.open) .faq-answer{display:none}
+.page-customizer-content .testimonial-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.page-customizer-content .testimonial-card{padding:24px}
+.page-customizer-content .testimonial-review{color:var(--pc-ink);font-size:18px}
+.page-customizer-content .image-carousel{position:relative;overflow:hidden}
+.page-customizer-content .image-carousel-track{display:grid}
+.page-customizer-content .image-slide{min-height:430px;display:grid;align-items:end;background:linear-gradient(rgba(32,33,38,.18),rgba(32,33,38,.44)),var(--slide-image) center/cover no-repeat}
+.page-customizer-content .image-carousel-content{padding-bottom:44px}
+.page-customizer-content .image-carousel-content h2,.page-customizer-content .image-carousel-content .eyebrow{color:#fff}
+.page-customizer-content .contact-list{display:grid;gap:12px;margin-top:24px}
+.page-customizer-content .contact-list p{margin:0;padding:14px 16px;border:1px solid var(--pc-border);border-radius:10px;background:#fff;color:var(--pc-ink);box-shadow:0 10px 22px rgba(232,72,132,.07)}
+.page-customizer-content .contact-list span{display:block;margin-bottom:3px;color:var(--pc-pink);font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
+.page-customizer-content .request-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:20px;border:1px solid var(--pc-border);border-radius:14px;background:#fff;box-shadow:0 14px 34px rgba(232,72,132,.1)}
+.page-customizer-content .request-form label{min-width:0;display:grid;gap:6px;color:#374151;font-size:12px;font-weight:800;letter-spacing:0;text-transform:none}
+.page-customizer-content .request-form input,.page-customizer-content .request-form select,.page-customizer-content .request-form textarea{width:100%;min-width:0;min-height:42px;margin:0;border:1px solid #f0dbe4;border-radius:8px;padding:10px 12px;background:#fff;color:var(--pc-ink);font:inherit;font-size:13px;box-shadow:none;outline:none}
+.page-customizer-content .request-form input:focus,.page-customizer-content .request-form select:focus,.page-customizer-content .request-form textarea:focus{border-color:var(--pc-pink);box-shadow:0 0 0 3px rgba(239,63,135,.12)}
+.page-customizer-content .request-form textarea{min-height:118px;resize:vertical}
+.page-customizer-content .request-form .wide,.page-customizer-content .request-form button{grid-column:1/-1}
+.page-customizer-content .request-form button{justify-self:start;border:0}
+.page-customizer-content .site-header,.page-customizer-content .footer{display:none}
+@media(max-width:900px){.page-customizer-content .feature-grid,.page-customizer-content .bordered-grid,.page-customizer-content .step-grid,.page-customizer-content .about-layout,.page-customizer-content .contact-layout,.page-customizer-content .request-layout,.page-customizer-content .testimonial-grid{grid-template-columns:1fr}.page-customizer-content .hero{min-height:430px}.page-customizer-content .hero:before{background:rgba(255,247,250,.86)}}
+@media(max-width:600px){.page-customizer-content .container,.page-customizer-content .wide-grid{width:calc(100% - 28px)}.page-customizer-content .section-pad{padding:38px 0}.page-customizer-content .request-form{grid-template-columns:1fr;padding:16px}.page-customizer-content .request-form .wide,.page-customizer-content .request-form button{grid-column:auto}}

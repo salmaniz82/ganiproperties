@@ -1,0 +1,44 @@
+{
+  "id": "services",
+  "name": "Services",
+  "schema": {
+    "eyebrow": {
+      "type": "text",
+      "label": "Eyebrow"
+    },
+    "title": {
+      "type": "text",
+      "label": "Title"
+    },
+    "highlight": {
+      "type": "text",
+      "label": "Highlight"
+    },
+    "text": {
+      "type": "textarea",
+      "label": "Text"
+    },
+    "cards": {
+      "type": "array",
+      "label": "Service cards",
+      "item": {
+        "number": {
+          "type": "text",
+          "label": "Number"
+        },
+        "title": {
+          "type": "text",
+          "label": "Title"
+        },
+        "text": {
+          "type": "textarea",
+          "label": "Text"
+        },
+        "bullets": {
+          "type": "textarea",
+          "label": "Bullets, one per line"
+        }
+      }
+    }
+  }
+}

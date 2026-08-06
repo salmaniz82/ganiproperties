@@ -1,0 +1,125 @@
+{
+    "name": "Events page",
+    "title": "Events by Party Poppers",
+    "template": "page",
+    "order": [
+        "hero",
+        "image_carousel",
+        "services",
+        "testimonials",
+        "request"
+    ],
+    "sections": {
+        "hero": {
+            "type": "hero",
+            "disabled": false,
+            "data": {
+                "eyebrow": "Events · Decor · Surprise planning",
+                "title": "Event styling",
+                "highlight": "with a joyful",
+                "title_after": "Party Poppers touch.",
+                "body": "Use JSON-powered sections to manage event content visually while keeping the page URL, metadata and publishing workflow in Laravel.",
+                "primary_button": "Plan an Event",
+                "secondary_button": "See Ideas",
+                "background_image": "/customizer/images/section-interior.png",
+                "features": [
+                    {
+                        "number": "01",
+                        "title": "Intimate parties",
+                        "text": "Small gatherings, birthday corners and surprise setups."
+                    },
+                    {
+                        "number": "02",
+                        "title": "Corporate gifting",
+                        "text": "Welcome gifts, team celebrations and branded baskets."
+                    },
+                    {
+                        "number": "03",
+                        "title": "Home celebrations",
+                        "text": "Decor and delivery for family moments at home."
+                    }
+                ]
+            }
+        },
+        "image_carousel": {
+            "type": "image-carousel",
+            "disabled": false,
+            "data": {
+                "slides": [
+                    {
+                        "title": "Birthday corners",
+                        "heading": "Styled setups for joyful photos",
+                        "image": "/customizer/images/hero-mayfair-night.png"
+                    },
+                    {
+                        "title": "Gift moments",
+                        "heading": "Flowers, cakes and baskets together",
+                        "image": "/customizer/images/section-london.png"
+                    }
+                ]
+            }
+        },
+        "services": {
+            "type": "services",
+            "disabled": false,
+            "data": {
+                "eyebrow": "Event ideas",
+                "title": "Flexible sections",
+                "highlight": "for event pages",
+                "text": "Add, remove and reorder sections from the page customizer, then save back to the selected JSON template.",
+                "cards": [
+                    {
+                        "number": "01",
+                        "title": "Birthday parties",
+                        "text": "Decor sets, balloon walls, cake tables and matching gift bundles.",
+                        "bullets": "Theme colors\nBackdrop styling\nCake table decor"
+                    },
+                    {
+                        "number": "02",
+                        "title": "Anniversary surprises",
+                        "text": "Flowers, chocolates, soft decor and delivery coordination.",
+                        "bullets": "Fresh flowers\nChocolate bouquets\nCustom message cards"
+                    },
+                    {
+                        "number": "03",
+                        "title": "Office celebrations",
+                        "text": "Baskets, cupcakes and table pieces for workplace milestones.",
+                        "bullets": "Team gifting\nBranded notes\nScheduled delivery"
+                    }
+                ]
+            }
+        },
+        "testimonials": {
+            "type": "testimonials",
+            "disabled": false,
+            "data": {
+                "items": [
+                    {
+                        "review": "The setup looked premium and was ready before guests arrived.",
+                        "name": "Demo Customer",
+                        "designation": "Birthday event"
+                    },
+                    {
+                        "review": "The custom basket and flowers made the surprise feel personal.",
+                        "name": "Demo Customer",
+                        "designation": "Anniversary gift"
+                    }
+                ]
+            }
+        },
+        "request": {
+            "type": "request",
+            "disabled": false,
+            "data": {
+                "eyebrow": "Start",
+                "title": "Plan the",
+                "highlight": "next event",
+                "intro": "Share the date, city, theme and budget. We will help shape the package.",
+                "phone": "+92 300 1234567",
+                "email": "events@partypoppers.pk",
+                "address": "Lahore, Karachi & Islamabad",
+                "button": "Request Event Help"
+            }
+        }
+    }
+}

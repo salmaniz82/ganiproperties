@@ -1,0 +1,140 @@
+{
+    "name": "Services page",
+    "title": "Party Poppers Services",
+    "template": "page",
+    "order": [
+        "hero",
+        "services",
+        "steps",
+        "faq",
+        "request"
+    ],
+    "sections": {
+        "hero": {
+            "type": "hero",
+            "disabled": false,
+            "data": {
+                "eyebrow": "Decorations · Gifts · Same-day city delivery zzz",
+                "title": "Celebration services",
+                "highlight": "made simple",
+                "title_after": "from planning to delivery.",
+                "body": "Choose balloons, backdrops, flowers, cakes, gift baskets and personalized items from one coordinated celebration team.",
+                "primary_button": "Plan a Celebration",
+                "secondary_button": "View Services",
+                "background_image": "/customizer/images/hero-mayfair-night.png",
+                "features": [
+                    {
+                        "number": "01",
+                        "title": "Birthday setups",
+                        "text": "Theme styling, balloon arches, table decor and photo backdrops."
+                    },
+                    {
+                        "number": "02",
+                        "title": "Gift delivery",
+                        "text": "Flowers, chocolates, cakes and custom gift baskets delivered with care."
+                    },
+                    {
+                        "number": "03",
+                        "title": "Personalized items",
+                        "text": "Custom mugs, notes, packaging and add-ons for memorable surprises."
+                    }
+                ]
+            }
+        },
+        "services": {
+            "type": "services",
+            "disabled": false,
+            "data": {
+                "eyebrow": "Services",
+                "title": "Everything for",
+                "highlight": "the perfect party",
+                "text": "Flexible sections make it easy to manage service content visually without turning the page into a free-form builder.",
+                "cards": [
+                    {
+                        "number": "01",
+                        "title": "Birthday Decorations",
+                        "text": "Balloon arches, birthday backdrops, neon signs and themed table styling.",
+                        "bullets": "Balloon arch kits\nBackdrop installations\nTable decoration sets"
+                    },
+                    {
+                        "number": "02",
+                        "title": "Gift Baskets",
+                        "text": "Curated baskets for birthdays, anniversaries, welcome gifts and corporate surprises.",
+                        "bullets": "Chocolate baskets\nFlower pairings\nPersonalized notes"
+                    },
+                    {
+                        "number": "03",
+                        "title": "Flowers & Cakes",
+                        "text": "Fresh bouquets and cake delivery options for same-day celebration moments.",
+                        "bullets": "Rose bouquets\nBirthday cakes\nCupcake sets"
+                    }
+                ]
+            }
+        },
+        "steps": {
+            "type": "steps",
+            "disabled": false,
+            "data": {
+                "eyebrow": "How it works",
+                "title": "Pick, personalize",
+                "highlight": "and celebrate.",
+                "cta": "Start a Request",
+                "items": [
+                    {
+                        "number": "01",
+                        "title": "Choose your service",
+                        "text": "Select decorations, gifts, cakes or flowers."
+                    },
+                    {
+                        "number": "02",
+                        "title": "Add the details",
+                        "text": "Tell us names, colors, delivery timing and personalization."
+                    },
+                    {
+                        "number": "03",
+                        "title": "We prepare it",
+                        "text": "The team packs, styles and coordinates the order."
+                    },
+                    {
+                        "number": "04",
+                        "title": "Delivered with care",
+                        "text": "Your celebration arrives ready for the big moment."
+                    }
+                ]
+            }
+        },
+        "faq": {
+            "type": "faq",
+            "disabled": false,
+            "data": {
+                "eyebrow": "Questions",
+                "title": "Service",
+                "highlight": "FAQ",
+                "items": [
+                    {
+                        "question": "Can I customize a service package?",
+                        "answer": "Yes. Add your preferred colors, message, delivery date and product mix when you request the service."
+                    },
+                    {
+                        "question": "Do you offer same-day delivery?",
+                        "answer": "Same-day delivery depends on city, product availability and order cutoff time."
+                    }
+                ]
+            }
+        },
+        "request": {
+            "type": "request",
+            "disabled": false,
+            "data": {
+                "eyebrow": "Request",
+                "title": "Need a",
+                "highlight": "custom package?",
+                "intro": "Send your idea and the team will help shape it into a celebration-ready order.",
+                "phone": "+92 300 1234567",
+                "email": "hello@partypoppers.pk",
+                "address": "Lahore, Karachi & Islamabad",
+                "button": "Send Request"
+            }
+        }
+    }
+}

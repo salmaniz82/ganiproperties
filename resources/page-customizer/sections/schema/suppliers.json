@@ -1,0 +1,40 @@
+{
+  "id": "suppliers",
+  "name": "Supplier network",
+  "schema": {
+    "eyebrow": {
+      "type": "text",
+      "label": "Eyebrow"
+    },
+    "title": {
+      "type": "text",
+      "label": "Title"
+    },
+    "highlight": {
+      "type": "text",
+      "label": "Highlight"
+    },
+    "text": {
+      "type": "textarea",
+      "label": "Text"
+    },
+    "items": {
+      "type": "array",
+      "label": "Suppliers",
+      "item": {
+        "category": {
+          "type": "text",
+          "label": "Category"
+        },
+        "name": {
+          "type": "text",
+          "label": "Name"
+        },
+        "text": {
+          "type": "textarea",
+          "label": "Text"
+        }
+      }
+    }
+  }
+}

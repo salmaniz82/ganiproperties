@@ -1,0 +1,24 @@
+{
+  "id": "footer",
+  "name": "Footer",
+  "schema": {
+    "brand_name": { "type": "text", "label": "Brand name" },
+    "brand_location": { "type": "text", "label": "Brand location" },
+    "description": { "type": "textarea", "label": "Description" },
+    "contact_heading": { "type": "text", "label": "Contact heading" },
+    "phone": { "type": "text", "label": "Phone" },
+    "email": { "type": "text", "label": "Email" },
+    "address": { "type": "textarea", "label": "Address" },
+    "suppliers_heading": { "type": "text", "label": "Suppliers heading" },
+    "suppliers": { "type": "textarea", "label": "Suppliers, one per line" },
+    "copyright": { "type": "text", "label": "Copyright" },
+    "links": {
+      "type": "array",
+      "label": "Footer links",
+      "item": {
+        "label": { "type": "text", "label": "Label" },
+        "href": { "type": "text", "label": "Link" }
+      }
+    }
+  }
+}

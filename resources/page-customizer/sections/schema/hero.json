@@ -1,0 +1,56 @@
+{
+  "id": "hero",
+  "name": "Hero",
+  "schema": {
+    "eyebrow": {
+      "type": "text",
+      "label": "Eyebrow"
+    },
+    "title": {
+      "type": "text",
+      "label": "Title"
+    },
+    "highlight": {
+      "type": "text",
+      "label": "Highlighted title words"
+    },
+    "title_after": {
+      "type": "text",
+      "label": "Title after highlight"
+    },
+    "body": {
+      "type": "textarea",
+      "label": "Body"
+    },
+    "primary_button": {
+      "type": "text",
+      "label": "Primary button"
+    },
+    "secondary_button": {
+      "type": "text",
+      "label": "Secondary button"
+    },
+    "background_image": {
+      "type": "image",
+      "label": "Background image"
+    },
+    "features": {
+      "type": "array",
+      "label": "Feature strip",
+      "item": {
+        "number": {
+          "type": "text",
+          "label": "Number"
+        },
+        "title": {
+          "type": "text",
+          "label": "Title"
+        },
+        "text": {
+          "type": "textarea",
+          "label": "Text"
+        }
+      }
+    }
+  }
+}

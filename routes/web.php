@@ -1,0 +1,67 @@
+<?php
+
+use App\Http\Controllers\{AdminController, AdminCategoryController, AdminMediaController, AdminPageController, AdminPageCustomizerController, AdminProductController, AuthController, CheckoutController, PageController, StoreController, WishlistController};
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', [StoreController::class,'home'])->name('home');
+Route::get('/shop', [StoreController::class,'catalog'])->name('shop');
+Route::get('/shop/page/{page}', [StoreController::class,'catalog'])->whereNumber('page')->name('shop.page');
+Route::get('/product-category/{category:slug}', [StoreController::class,'catalog'])->name('category.show');
+Route::get('/product-category/{category:slug}/page/{page}', [StoreController::class,'catalog'])->whereNumber('page')->name('category.page');
+Route::get('/products/{product:slug}', [StoreController::class,'product'])->name('products.show');
+Route::get('/cart', [StoreController::class,'cart'])->name('cart');
+Route::post('/cart/{product}', [StoreController::class,'addCart'])->name('cart.add');
+Route::put('/cart/{key}', [StoreController::class,'updateCart'])->name('cart.update');
+Route::delete('/cart/{key}', [StoreController::class,'removeCart'])->name('cart.remove');
+Route::delete('/cart', [StoreController::class,'clearCart'])->name('cart.clear');
+Route::get('/checkout', [StoreController::class,'checkout'])->name('checkout');
+Route::post('/checkout', [CheckoutController::class,'store'])->name('checkout.store');
+Route::get('/order-success/{order:number}', [CheckoutController::class,'success'])->name('orders.success');
+Route::match(['get','post'],'/track-order', [StoreController::class,'track'])->name('track');
+Route::get('/login', [AuthController::class,'show'])->name('login');
+Route::post('/login', [AuthController::class,'login'])->name('login.store');
+Route::get('/register', [AuthController::class,'showRegister'])->name('register.show');
+Route::post('/register', [AuthController::class,'register'])->name('register');
+Route::post('/logout', [AuthController::class,'logout'])->name('logout');
+Route::middleware('auth')->group(function () {
+    Route::get('/account', [AuthController::class,'account'])->name('account');
+    Route::post('/wishlist/{product}', [WishlistController::class,'toggle'])->name('wishlist.toggle');
+});
+Route::prefix('dashboard')->name('admin.')->middleware(['auth','admin'])->group(function () {
+    Route::get('/', [AdminController::class,'dashboard'])->name('dashboard');
+    Route::get('/products', [AdminProductController::class,'index'])->name('products');
+    Route::get('/products/create', [AdminProductController::class,'create'])->name('products.create');
+    Route::post('/products', [AdminProductController::class,'store'])->name('products.store');
+    Route::get('/products/{product}/edit', [AdminProductController::class,'edit'])->name('products.edit');
+    Route::put('/products/{product}', [AdminProductController::class,'update'])->name('products.update');
+    Route::delete('/products/{product}', [AdminProductController::class,'destroy'])->name('products.destroy');
+    Route::get('/categories', [AdminCategoryController::class,'index'])->name('categories');
+    Route::get('/categories/create', [AdminCategoryController::class,'create'])->name('categories.create');
+    Route::post('/categories', [AdminCategoryController::class,'store'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [AdminCategoryController::class,'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [AdminCategoryController::class,'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminCategoryController::class,'destroy'])->name('categories.destroy');
+    Route::get('/media', [AdminMediaController::class,'index'])->name('media');
+    Route::post('/media', [AdminMediaController::class,'store'])->name('media.store');
+    Route::put('/media/{media}', [AdminMediaController::class,'update'])->name('media.update');
+    Route::delete('/media/{media}', [AdminMediaController::class,'destroy'])->name('media.destroy');
+    Route::get('/pages', [AdminPageController::class,'index'])->name('pages');
+    Route::get('/pages/create', [AdminPageController::class,'create'])->name('pages.create');
+    Route::post('/pages', [AdminPageController::class,'store'])->name('pages.store');
+    Route::get('/pages/{page}/edit', [AdminPageController::class,'edit'])->name('pages.edit');
+    Route::put('/pages/{page}', [AdminPageController::class,'update'])->name('pages.update');
+    Route::get('/pages/{page}/customizer', [AdminPageCustomizerController::class,'edit'])->name('pages.customizer');
+    Route::get('/pages/{page}/customizer/schema', [AdminPageCustomizerController::class,'schema'])->name('pages.customizer.schema');
+    Route::get('/pages/{page}/customizer/template', [AdminPageCustomizerController::class,'template'])->name('pages.customizer.template');
+    Route::post('/pages/{page}/customizer/template', [AdminPageCustomizerController::class,'save'])->name('pages.customizer.save');
+    Route::post('/pages/{page}/customizer/upload', [AdminPageCustomizerController::class,'upload'])->name('pages.customizer.upload');
+    Route::get('/pages/{page}/customizer/preview', [AdminPageCustomizerController::class,'preview'])->name('pages.customizer.preview');
+    Route::get('/orders', [AdminController::class,'orders'])->name('orders');
+    Route::put('/orders/{order}', [AdminController::class,'updateOrder'])->name('orders.update');
+    Route::get('/delivery-zones', [AdminController::class,'zones'])->name('zones');
+    Route::post('/delivery-zones', [AdminController::class,'saveZone'])->name('zones.save');
+    Route::get('/customers', [AdminController::class,'customers'])->name('customers');
+    Route::get('/settings', [AdminController::class,'settings'])->name('settings');
+    Route::post('/promotions', [AdminController::class,'savePromotion'])->name('promotions.save');
+});
+Route::get('/{page:slug}', [PageController::class,'show'])->name('pages.show');
