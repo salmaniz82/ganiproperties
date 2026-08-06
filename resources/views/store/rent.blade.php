@@ -17,7 +17,7 @@
 
     <section class="listing-filter-wrap" aria-label="Filter properties">
         <form class="listing-filter" action="{{ route('rent') }}" method="get">
-            <label><span>Section</span><select aria-label="Current property section" disabled><option>Rent</option></select></label>
+            <div class="listing-section-field"><span>Section</span><strong>Rent</strong></div>
             <label><span>Location</span><select name="location"><option value="">Any location</option>
                 @foreach($locations as $location)
                     <option value="{{ $location }}" @selected($filters['location'] === $location)>{{ $location }}</option>

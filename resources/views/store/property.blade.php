@@ -1,17 +1,21 @@
 @extends('layouts.store')
 @section('title', $property['title'].', '.$property['area'].' | Gani Property Services')
 @php
-    $activePage = 'rent';
+    $isCommercial = $property['intent'] === 'commercial';
+    $activePage = $isCommercial ? 'commercial' : 'rent';
+    $listingRoute = $isCommercial ? route('commercial') : route('rent');
+    $listingLabel = $isCommercial ? 'Commercial' : 'Rent';
+    $priceCaption = $isCommercial ? 'Annual rent' : 'Monthly rent';
     $gallery = collect([$property['image'], '/assets/property-1-ref.jpg', '/assets/property-2-ref.jpg', '/assets/property-3-ref.jpg', '/assets/property-4-ref.jpg'])->unique()->take(4)->values();
-    $contactUrl = route('contact', ['property' => $property['title'].', '.$property['area'], 'interest' => 'Renting']);
+    $contactUrl = route('contact', ['property' => $property['title'].', '.$property['area'], 'interest' => $isCommercial ? 'Commercial' : 'Renting']);
 @endphp
 @section('content')
 <main id="top">
     <section class="property-title-section section">
-        <nav class="property-breadcrumbs" aria-label="Breadcrumb"><a href="{{ route('home') }}">Home</a><span>/</span><a href="{{ route('rent') }}">Rent</a><span>/</span><span>{{ $property['title'] }}</span></nav>
+        <nav class="property-breadcrumbs" aria-label="Breadcrumb"><a href="{{ route('home') }}">Home</a><span>/</span><a href="{{ $listingRoute }}">{{ $listingLabel }}</a><span>/</span><span>{{ $property['title'] }}</span></nav>
         <div class="property-title-row">
             <div><span class="property-status property-title-status">{{ strtoupper($property['status']) }}</span><p>{{ $property['type'] }}</p><h1>{{ $property['title'] }}</h1><p class="property-address"><svg><use href="#icon-pin"/></svg>{{ $property['area'] }}, {{ $property['postcode'] }}</p></div>
-            <div class="property-price-block"><span>Guide price</span><strong>{!! $property['price_label'] !!}</strong><small>Ref: {{ $property['reference'] }}</small></div>
+            <div class="property-price-block"><span>{{ $priceCaption }}</span><strong>{!! $property['price_label'] !!}</strong><small>Ref: {{ $property['reference'] }}</small></div>
         </div>
     </section>
 

@@ -15,7 +15,7 @@ class StaticFrontendController extends Controller
 
     public function rent(Request $request, ?string $area = null, ?string $type = null)
     {
-        $properties = collect($this->properties());
+        $properties = collect($this->properties('rent'));
         $areaName = $area ? $this->valueFromSlug($properties->pluck('area')->unique(), $area) : '';
         $typeName = $type ? $this->valueFromSlug($properties->pluck('type')->unique(), $type) : '';
         $filters = [
@@ -47,6 +47,38 @@ class StaticFrontendController extends Controller
         ]);
     }
 
+    public function commercial(Request $request, ?string $area = null, ?string $rentPeriod = null)
+    {
+        $properties = collect($this->properties('commercial'))
+            ->filter(fn (array $property) => strcasecmp($property['status'] ?? '', 'To let') === 0)
+            ->values();
+        $areaName = $area ? $this->valueFromSlug($properties->pluck('area')->unique(), $area) : '';
+        $rentPeriodName = $rentPeriod ? $this->valueFromSlug($properties->pluck('rent_period')->unique(), $rentPeriod) : '';
+        $filters = [
+            'location' => $areaName ?: trim((string) $request->query('location', '')),
+            'rent_period' => $rentPeriodName ?: trim((string) $request->query('rent_period', '')),
+            'max_price' => trim((string) $request->query('max_price', '')),
+            'sort' => trim((string) $request->query('sort', 'newest')),
+        ];
+
+        $filtered = $properties
+            ->when($filters['location'] !== '', fn ($items) => $items->where('area', $filters['location']))
+            ->when($filters['rent_period'] !== '', fn ($items) => $items->where('rent_period', $filters['rent_period']))
+            ->when($filters['max_price'] !== '', fn ($items) => $items->filter(fn ($property) => $property['price'] <= (int) $filters['max_price']));
+
+        $filtered = match ($filters['sort']) {
+            'price-low' => $filtered->sortBy('price'),
+            'price-high' => $filtered->sortByDesc('price'),
+            default => $filtered->sortByDesc('reference'),
+        };
+
+        return view('store.commercial', [
+            'properties' => $filtered->values(),
+            'filters' => $filters,
+            'locations' => $properties->pluck('area')->unique()->sort()->values(),
+        ]);
+    }
+
     public function property(string $slug)
     {
         $property = collect($this->properties())->firstWhere('slug', $slug);
@@ -54,6 +86,7 @@ class StaticFrontendController extends Controller
 
         $related = collect($this->properties())
             ->where('slug', '!=', $property['slug'])
+            ->where('intent', $property['intent'])
             ->where('type', $property['type'])
             ->take(3)
             ->values();
@@ -81,10 +114,12 @@ class StaticFrontendController extends Controller
         ]);
     }
 
-    private function properties(): array
+    private function properties(?string $intent = null): array
     {
         return collect(config('gani_properties', []))
-            ->filter(fn (array $property) => ($property['intent'] ?? null) === 'rent')
+            ->when($intent !== null, fn ($properties) => $properties->filter(
+                fn (array $property) => ($property['intent'] ?? null) === $intent
+            ))
             ->values()
             ->all();
     }

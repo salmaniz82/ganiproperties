@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate(['email'=>'admin@ganipropertyservices.co.uk'],['name'=>'Gani Property Admin','phone'=>'02086737778','password'=>'password','is_admin'=>true]);
+        User::updateOrCreate(['email'=>'app@ganiproperties.co.uk'],['name'=>'Gani Property Admin','phone'=>'02086737778','password'=>'password','is_admin'=>true]);
         User::updateOrCreate(['email'=>'customer@example.com'],['name'=>'Demo Customer','phone'=>'03009876543','password'=>'password','is_admin'=>false]);
 
         $categories = [

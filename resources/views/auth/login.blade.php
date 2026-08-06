@@ -1,27 +1,47 @@
-@extends('layouts.store')
-@section('title', 'Login | Gani Property Services')
-@php($activePage = 'login')
-@section('content')
-<main id="top">
-    <section class="auth-hero">
-        <div class="auth-panel">
-            <p class="eyebrow">CLIENT ACCESS</p>
-            <h1>Welcome back</h1>
-            <p>Access your account details, saved properties and enquiry history.</p>
-            <form method="post" action="{{ route('login.store') }}" class="contact-form auth-form">
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login | Gani Property Services</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+</head>
+<body>
+    <main class="login-page">
+        <section class="login-panel" aria-labelledby="login-title">
+            <a class="login-logo" href="{{ route('home') }}" aria-label="Gani Property Services home">
+                <img src="{{ asset('images/Gani-Logo.svg') }}" alt="Gani Property Services">
+            </a>
+
+            <div class="login-heading">
+                <h1 id="login-title">Sign in</h1>
+                <p>Enter your details to access the dashboard.</p>
+            </div>
+
+            @if($errors->any())
+                <div class="login-error" role="alert">{{ $errors->first() }}</div>
+            @endif
+
+            <form method="post" action="{{ route('login.store') }}" class="login-form">
                 @csrf
-                <label class="form-field"><span>Email address</span><input type="email" name="email" value="{{ old('email') }}" autocomplete="email" required></label>
-                <label class="form-field"><span>Password</span><input type="password" name="password" autocomplete="current-password" required></label>
-                <label class="auth-check"><input type="checkbox" name="remember" value="1"> <span>Remember me</span></label>
-                <button class="button" type="submit">Login</button>
+                <label>
+                    <span>Email address</span>
+                    <input type="email" name="email" value="{{ old('email', 'app@ganiproperties.co.uk') }}" autocomplete="email" required autofocus>
+                </label>
+                <label>
+                    <span>Password</span>
+                    <input type="password" name="password" autocomplete="current-password" required>
+                </label>
+                <label class="remember-field">
+                    <input type="checkbox" name="remember" value="1">
+                    <span>Remember me</span>
+                </label>
+                <button type="submit">Login</button>
             </form>
-            <p class="auth-switch">New to Gani? <a href="{{ route('register.show') }}">Create account</a></p>
-        </div>
-        <div class="auth-aside">
-            <p class="eyebrow eyebrow-light">LOCAL SUPPORT</p>
-            <h2>Speak with the Balham team any time.</h2>
-            <a class="button button-white" href="{{ route('contact') }}">Contact us</a>
-        </div>
-    </section>
-</main>
-@endsection
+        </section>
+    </main>
+</body>
+</html>

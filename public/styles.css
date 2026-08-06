@@ -428,8 +428,10 @@ h1, h2 { font-family: "Plus Jakarta Sans", Arial, Helvetica, sans-serif; font-we
 .listing-masthead > div > p:last-child { margin: 0; color: #d0cfda; font-size: 15px; }
 .listing-filter-wrap { width: min(1334px, calc(100% - 96px)); margin: -38px auto 0; position: relative; z-index: 4; }
 .listing-filter { display: grid; grid-template-columns: 1fr 1fr 1fr .75fr 1fr auto; align-items: end; gap: 0; padding: 18px; border-radius: 8px; background: #fff; box-shadow: 0 12px 32px rgba(17, 17, 30, .14); }
-.listing-filter label { min-width: 0; padding: 7px 17px; border-right: 1px solid var(--line); }
-.listing-filter label > span { display: block; margin-bottom: 8px; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.listing-filter-commercial { grid-template-columns: 1fr 1fr 1fr 1fr auto; }
+.listing-filter label, .listing-section-field { min-width: 0; padding: 7px 17px; border-right: 1px solid var(--line); }
+.listing-filter label > span, .listing-section-field > span { display: block; margin-bottom: 8px; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.listing-section-field strong { display: block; color: var(--purple); font-size: 12px; line-height: 17px; }
 .listing-filter select { width: 100%; border: 0; outline: none; background: #fff; color: #35323b; font-size: 12px; }
 .listing-filter select:disabled { opacity: 1; color: var(--purple); font-weight: 700; cursor: default; }
 .listing-filter .button { min-height: 49px; margin-left: 17px; white-space: nowrap; }
@@ -548,7 +550,7 @@ h1, h2 { font-family: "Plus Jakarta Sans", Arial, Helvetica, sans-serif; font-we
   .listing-masthead h1 { font-size: 42px; }
   .listing-filter-wrap { width: calc(100% - 28px); margin-top: -32px; }
   .listing-filter { grid-template-columns: 1fr 1fr; padding: 14px; }
-  .listing-filter label { padding: 9px 11px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .listing-filter label, .listing-section-field { padding: 9px 11px; border-right: 0; border-bottom: 1px solid var(--line); }
   .listing-filter .button { grid-column: 1 / -1; margin: 9px 11px 2px; }
   .property-results { padding-top: 48px; }
   .results-toolbar { align-items: flex-start; }

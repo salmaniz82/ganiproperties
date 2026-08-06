@@ -78,7 +78,7 @@ return [
     'streatham-commercial' => [
         'slug' => 'streatham-commercial', 'intent' => 'commercial', 'status' => 'To let', 'title' => 'Streatham High Road',
         'area' => 'Streatham', 'postcode' => 'SW16', 'price' => 45000, 'price_label' => '&pound;45,000 pa',
-        'bedrooms' => 0, 'bathrooms' => 1, 'receptions' => 0, 'type' => 'Retail premises',
+        'bedrooms' => 0, 'bathrooms' => 1, 'receptions' => 0, 'type' => 'Retail premises', 'rent_period' => 'Yearly',
         'image' => '/assets/property-4-ref.jpg', 'tenure' => 'New lease', 'council_tax' => 'Business rates apply',
         'epc' => 'C', 'floor_area' => '1,425 sq ft / 132.4 sq m', 'reference' => 'GPS-C309',
         'summary' => 'A prominent ground-floor commercial unit with strong frontage on a busy South London high street.',

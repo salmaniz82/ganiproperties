@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>@yield('title', 'Admin') | Party Poppers</title>
+    <title>@yield('title', 'Admin') | Gani Property</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -28,8 +28,8 @@
 
 <aside class="sidebar">
     <div class="workspace-switcher">
-        <span class="workspace-mark">P</span>
-        <div><b>Party Poppers</b><small>Default workspace</small></div>
+        <span class="workspace-mark">G</span>
+        <div><b>Gani Property</b><small>Property workspace</small></div>
         <span class="chevrons">⌃⌄</span>
     </div>
 
@@ -59,7 +59,7 @@
 <main class="admin-main">
     <header class="top-header">
         <button class="icon-button menu-button" type="button">☰</button>
-        <div class="breadcrumbs"><span>Party Poppers</span><b>/</b><strong>@yield('heading', 'Home')</strong></div>
+        <div class="breadcrumbs"><span>Gani Property</span><b>/</b><strong>@yield('heading', 'Home')</strong></div>
         <div class="header-actions"><button class="icon-button" title="Search">⌕</button><button class="icon-button" title="Notifications">○</button></div>
     </header>
 

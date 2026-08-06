@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [StaticFrontendController::class, 'home'])->name('home');
 Route::get('/rent', [StaticFrontendController::class, 'rent'])->name('rent');
 Route::get('/rent/london/{area}/{type?}', [StaticFrontendController::class, 'rent'])->name('rent.area');
+Route::get('/commercial', [StaticFrontendController::class, 'commercial'])->name('commercial');
+Route::get('/commercial/london/{area}/{rentPeriod?}', [StaticFrontendController::class, 'commercial'])->name('commercial.area');
 Route::get('/properties', fn () => redirect()->route('rent'))->name('properties');
 Route::get('/property/{slug}', [StaticFrontendController::class, 'property'])->name('property.show');
 Route::get('/landlords', [StaticFrontendController::class, 'landlords'])->name('landlords');
