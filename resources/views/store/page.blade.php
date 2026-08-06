@@ -10,7 +10,7 @@
 @endif
 @section('content')
 <section class="section narrow policy-page">
-    <div class="page-head"><div><small>PARTY POPPERS</small><h1>{{ $page->title }}</h1></div></div>
+    <div class="page-head"><div><small>GANI PROPERTY SERVICES</small><h1>{{ $page->title }}</h1></div></div>
     <div class="panel stack">
         @foreach(preg_split("/\r\n|\n|\r/", $page->content ?: '') as $paragraph)
             @if(trim($paragraph) !== '')<p>{{ $paragraph }}</p>@endif

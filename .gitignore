@@ -29,4 +29,5 @@ info.txt
 .editorconfig
 .gitattributes
 layout-files
-
+PROJECT.md
+frontend.md

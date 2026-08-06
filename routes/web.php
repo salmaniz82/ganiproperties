@@ -1,32 +1,21 @@
 <?php
 
-use App\Http\Controllers\{AdminController, AdminCategoryController, AdminMediaController, AdminPageController, AdminPageCustomizerController, AdminProductController, AuthController, CheckoutController, PageController, StoreController, WishlistController};
+use App\Http\Controllers\{AdminController, AdminCategoryController, AdminMediaController, AdminPageController, AdminPageCustomizerController, AdminProductController, AuthController, PageController, StaticFrontendController};
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [StoreController::class,'home'])->name('home');
-Route::get('/shop', [StoreController::class,'catalog'])->name('shop');
-Route::get('/shop/page/{page}', [StoreController::class,'catalog'])->whereNumber('page')->name('shop.page');
-Route::get('/product-category/{category:slug}', [StoreController::class,'catalog'])->name('category.show');
-Route::get('/product-category/{category:slug}/page/{page}', [StoreController::class,'catalog'])->whereNumber('page')->name('category.page');
-Route::get('/products/{product:slug}', [StoreController::class,'product'])->name('products.show');
-Route::get('/cart', [StoreController::class,'cart'])->name('cart');
-Route::post('/cart/{product}', [StoreController::class,'addCart'])->name('cart.add');
-Route::put('/cart/{key}', [StoreController::class,'updateCart'])->name('cart.update');
-Route::delete('/cart/{key}', [StoreController::class,'removeCart'])->name('cart.remove');
-Route::delete('/cart', [StoreController::class,'clearCart'])->name('cart.clear');
-Route::get('/checkout', [StoreController::class,'checkout'])->name('checkout');
-Route::post('/checkout', [CheckoutController::class,'store'])->name('checkout.store');
-Route::get('/order-success/{order:number}', [CheckoutController::class,'success'])->name('orders.success');
-Route::match(['get','post'],'/track-order', [StoreController::class,'track'])->name('track');
+Route::get('/', [StaticFrontendController::class, 'home'])->name('home');
+Route::get('/rent', [StaticFrontendController::class, 'rent'])->name('rent');
+Route::get('/rent/london/{area}/{type?}', [StaticFrontendController::class, 'rent'])->name('rent.area');
+Route::get('/properties', fn () => redirect()->route('rent'))->name('properties');
+Route::get('/property/{slug}', [StaticFrontendController::class, 'property'])->name('property.show');
+Route::get('/landlords', [StaticFrontendController::class, 'landlords'])->name('landlords');
+Route::get('/about-us', [StaticFrontendController::class, 'about'])->name('about');
+Route::get('/contact', [StaticFrontendController::class, 'contact'])->name('contact');
 Route::get('/login', [AuthController::class,'show'])->name('login');
 Route::post('/login', [AuthController::class,'login'])->name('login.store');
 Route::get('/register', [AuthController::class,'showRegister'])->name('register.show');
 Route::post('/register', [AuthController::class,'register'])->name('register');
 Route::post('/logout', [AuthController::class,'logout'])->name('logout');
-Route::middleware('auth')->group(function () {
-    Route::get('/account', [AuthController::class,'account'])->name('account');
-    Route::post('/wishlist/{product}', [WishlistController::class,'toggle'])->name('wishlist.toggle');
-});
 Route::prefix('dashboard')->name('admin.')->middleware(['auth','admin'])->group(function () {
     Route::get('/', [AdminController::class,'dashboard'])->name('dashboard');
     Route::get('/products', [AdminProductController::class,'index'])->name('products');
@@ -64,4 +53,4 @@ Route::prefix('dashboard')->name('admin.')->middleware(['auth','admin'])->group(
     Route::get('/settings', [AdminController::class,'settings'])->name('settings');
     Route::post('/promotions', [AdminController::class,'savePromotion'])->name('promotions.save');
 });
-Route::get('/{page:slug}', [PageController::class,'show'])->name('pages.show');
+Route::get('/{page:slug}', [PageController::class, 'show'])->name('pages.show');

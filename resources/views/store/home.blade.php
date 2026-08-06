@@ -1,112 +1,94 @@
 @extends('layouts.store')
-@section('title', 'Party Poppers Decoration Service')
-@section('content')
+@section('title', 'Gani Property Services | Balham Estate Agents')
 @php
-    $categoryUrl = fn (string $slug) => isset($categoryMap[$slug]) ? route('category.show', $categoryMap[$slug]) : route('shop');
+    $activePage = 'home';
+    $featuredProperties = collect(config('gani_properties', []))->where('intent', 'rent')->take(4);
 @endphp
-
-<section class="landing-hero" aria-label="Celebration collection">
-    <div class="landing-hero__panel">
-        <div class="landing-container">
-            <div class="landing-hero__copy">
-                <p>Make Every</p>
-                <h1><span>Celebration</span> Memorable</h1>
-                <ul>
-                    <li>Birthday Supplies</li>
-                    <li>Gift Baskets</li>
-                    <li>Flower Bouquets</li>
-                    <li>Balloons & Chocolate Bouquets</li>
-                </ul>
-                <a class="landing-btn" href="{{ route('shop') }}">Shop Now</a>
+@section('content')
+<main id="top">
+    <section class="hero">
+        <div class="hero-shade"></div>
+        <div class="hero-content">
+            <p class="eyebrow eyebrow-light">INDEPENDENT. LOCAL. BALHAM.</p>
+            <h1>Local property people,<br>doing right by Balham</h1>
+            <p class="hero-copy">Lettings, guaranteed rent and property management<br class="desktop-only"> from an independent team on Balham High Road.</p>
+            <div class="hero-buttons">
+                <a class="button" href="{{ route('rent') }}">Search rentals</a>
+                <a class="button button-outline" href="{{ route('contact') }}">Book a free valuation</a>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="landing-section landing-curated">
-    <div class="landing-container">
-        <div class="landing-head">
-            <h2><span>★</span>Bestsellers You'll Love<span class="pink">✣</span></h2>
-            <a href="{{ route('shop') }}">View All</a>
-        </div>
-        <div class="landing-bestsellers">
-            @foreach($featured as $product)
-                <article class="landing-store-card">
-                    @if($loop->first)<span class="landing-badge">Best Seller</span>@endif
-                    <a href="{{ route('products.show', $product) }}"><img src="{{ asset($product->thumbnail_image) }}" alt="{{ $product->name }}" loading="lazy"></a>
-                    <div>
-                        <a href="{{ route('products.show', $product) }}"><h3>{{ $product->name }}</h3></a>
-                        <p>{{ $product->category?->name }}</p>
-                        <strong>{{ $product->formatted_price }}</strong>
-                        <form class="js-ajax-add-cart" method="post" action="{{ route('cart.add', $product) }}">@csrf<input type="hidden" name="quantity" value="1"><button aria-label="Add {{ $product->name }} to cart">+</button></form>
+    <form class="property-search" id="search" action="{{ route('rent') }}" method="get">
+        <fieldset class="search-tabs">
+            <legend class="visually-hidden">Listing type</legend>
+            <label><input type="radio" name="intent" value="rent" checked> <span>Rent</span></label>
+        </fieldset>
+        <label class="search-field"><span>Location</span><select name="location"><option value="">Any</option><option>Balham</option><option>Tooting</option><option>Streatham</option></select></label>
+        <label class="search-field"><span>Property type</span><select name="type"><option value="">Any</option><option>Apartment</option><option>Maisonette</option><option>Terraced house</option></select></label>
+        <label class="search-field"><span>Bedrooms</span><select name="bedrooms"><option value="">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option></select></label>
+        <label class="search-field"><span>Max price</span><select name="max_price"><option value="">Any</option><option value="1800">&pound;1,800 pcm</option><option value="2500">&pound;2,500 pcm</option><option value="3500">&pound;3,500 pcm</option></select></label>
+        <button class="button search-button" type="submit">Search</button>
+    </form>
+
+    <section class="section listings" id="listings">
+        <div class="section-heading"><h2>Recently added rentals</h2><a href="{{ route('rent') }}">View all rentals &#8594;</a></div>
+        <div class="property-grid">
+            @foreach($featuredProperties as $property)
+                <article class="property-card">
+                    <a class="property-image" href="{{ route('property.show', $property['slug']) }}">
+                        <img src="{{ $property['image'] }}" alt="{{ $property['title'] }} property" loading="lazy">
+                        <span class="property-status">{{ strtoupper($property['status']) }}</span>
+                    </a>
+                    <div class="property-info">
+                        <h3><a href="{{ route('property.show', $property['slug']) }}">{{ $property['title'] }}</a></h3>
+                        <p>{{ $property['area'] }}, {{ $property['postcode'] }}</p>
+                        <div class="details">
+                            @if($property['bedrooms'] > 0)<span><svg><use href="#icon-bed"/></svg>{{ $property['bedrooms'] }}</span>@endif
+                            <span><svg><use href="#icon-bath"/></svg>{{ $property['bathrooms'] }}</span>
+                            @if($property['receptions'] > 0)<span><svg><use href="#icon-sofa"/></svg>{{ $property['receptions'] }}</span>@endif
+                        </div>
+                        <div class="price"><strong>{!! $property['price_label'] !!}</strong><a class="card-arrow" href="{{ route('property.show', $property['slug']) }}" aria-label="View {{ $property['title'] }}">&#8594;</a></div>
                     </div>
                 </article>
             @endforeach
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="landing-section landing-categories" aria-labelledby="category-title">
-    <div class="landing-container">
-        <h2 id="category-title" class="landing-title">Shop By <span>Category</span></h2>
-        <div class="landing-category-grid">
-            <a class="landing-category-card category-birthday tone-pink" href="{{ $categoryUrl('birthday-decorations') }}"><div class="landing-card-copy"><h3>Birthday Decorations</h3><p>Make Your Party Extra Special</p><span class="landing-btn">Explore</span></div></a>
-            <a class="landing-category-card category-balloons tone-blue" href="{{ $categoryUrl('balloons') }}"><div class="landing-card-copy"><h3>Balloons</h3><p>Brighten Every Moment</p><span class="landing-btn blue">Shop Now</span></div></a>
-            <a class="landing-category-card category-basket tone-blush" href="{{ $categoryUrl('gift-baskets') }}"><div class="landing-card-copy"><h3>Gift Baskets</h3><p>Happiness in a Basket</p><span class="landing-btn">Shop Now</span></div></a>
-            <a class="landing-category-card category-flowers tone-green" href="{{ $categoryUrl('flowers') }}"><div class="landing-card-copy"><h3>Flower Bouquets</h3><p>Fresh Flowers, Lasting Smiles</p><span class="landing-btn green">Shop Now</span></div></a>
-            <a class="landing-category-card category-chocolate tone-warm" href="{{ $categoryUrl('chocolate-bouquets') }}"><div class="landing-card-copy"><h3>Chocolate Bouquets</h3><p>Sweetness Wrapped with Love</p><span class="landing-btn brown">Shop Now</span></div></a>
-            <a class="landing-category-card category-cake tone-blue" href="{{ $categoryUrl('cakes') }}"><div class="landing-card-copy"><h3>Cakes & Sweet Treats</h3><p>Delicious Creations for Every Occasion</p><span class="landing-btn blue">Shop Now</span></div></a>
-            <a class="landing-category-card category-party tone-pink" href="{{ $categoryUrl('party-supplies') }}"><div class="landing-card-copy"><h3>Party Supplies</h3><p>Everything You Need to Party</p><span class="landing-btn">Explore</span></div></a>
-            <a class="landing-category-card category-occasion tone-green" href="{{ route('shop') }}"><div class="landing-card-copy"><h3>Occasion Based Gifts</h3><p>Gifts for Every Occasion</p><span class="landing-btn green">Shop Now</span></div></a>
-            <a class="landing-category-card category-custom tone-blue" href="{{ $categoryUrl('customized-items') }}"><div class="landing-card-copy"><h3>Customized Items</h3><p>Make It Personal, Make It Special</p><span class="landing-btn blue">Shop Now</span></div></a>
+    <section class="reasons section">
+        <h2>Why choose Gani?</h2>
+        <div class="reason-grid">
+            <article><span class="reason-icon"><svg><use href="#icon-pin"/></svg></span><h3>Local expertise</h3><p>We live and work on Balham High Road. We know the area inside and out.</p></article>
+            <article><span class="reason-icon"><svg><use href="#icon-chat"/></svg></span><h3>Personal service</h3><p>You will deal with knowledgeable people who care about your move as much as you do.</p></article>
+            <article><span class="reason-icon"><svg><use href="#icon-shield"/></svg></span><h3>Trusted advice</h3><p>Straightforward guidance for lettings, management and guaranteed rent.</p></article>
+            <article><span class="reason-icon"><svg><use href="#icon-key"/></svg></span><h3>Proven results</h3><p>Strong local marketing, great presentation and practical negotiation get the best outcome.</p></article>
         </div>
-    </div>
-</section>
+    </section>
 
-@if($birthdayProducts->isNotEmpty())
-<section class="landing-section landing-showcase">
-    <div class="landing-container">
-        <div class="landing-section-head"><h2>Birthday Decorations</h2><a href="{{ $categoryUrl('birthday-decorations') }}">View All</a></div>
-        <div class="landing-product-row">
-            @foreach($birthdayProducts as $product)
-                <a class="landing-product-card {{ $loop->iteration === 3 ? 'featured' : '' }}" href="{{ route('products.show', $product) }}"><img src="{{ asset($product->thumbnail_image) }}" alt="{{ $product->name }}" loading="lazy"><h3>{{ $product->name }}</h3><p>{{ $product->formatted_price }}</p></a>
-            @endforeach
+    <section class="about section" id="about">
+        <div class="about-image"><img src="/assets/office-ref.jpg" alt="Gani independent estate agency on Balham High Road" loading="lazy"></div>
+        <div class="about-copy">
+            <p class="eyebrow">OUR HOME. YOUR NEIGHBOURHOOD.</p>
+            <h2>Proudly independent on<br>Balham High Road</h2>
+            <p>We have been part of the Balham community for years, helping landlords and tenants move with confidence.</p>
+            <p>From Victorian terraces to modern apartments, we know the market and the people.</p>
+            <ul><li><svg><use href="#icon-check"/></svg>Lettings</li><li><svg><use href="#icon-check"/></svg>Guaranteed rent</li><li><svg><use href="#icon-check"/></svg>Property management</li><li><svg><use href="#icon-check"/></svg>Landlord advice</li></ul>
         </div>
-    </div>
-</section>
-@endif
+    </section>
 
-<section class="landing-section landing-compact-products">
-    <div class="landing-container landing-product-columns">
-        @foreach([['Flower Bouquets', $flowerProducts, 'flowers', 'blue-title'], ['Chocolate Bouquets', $chocolateProducts, 'chocolate-bouquets', 'warm-title'], ['Cakes & Sweet Treats', $cakeProducts, 'cakes', 'blue-title']] as [$title, $items, $slug, $tone])
-            <div>
-                <div class="landing-section-head compact {{ $tone }}"><h2>{{ $title }}</h2><a href="{{ $categoryUrl($slug) }}">View All</a></div>
-                <div class="landing-mini-grid">
-                    @foreach($items as $product)<a class="landing-product-card" href="{{ route('products.show', $product) }}"><img src="{{ asset($product->thumbnail_image) }}" alt="{{ $product->name }}" loading="lazy"><h3>{{ $product->name }}</h3><p>{{ $product->formatted_price }}</p></a>@endforeach
-                </div>
-            </div>
-        @endforeach
-    </div>
-</section>
-
-<section class="landing-section landing-promos">
-    <div class="landing-container landing-promo-grid">
-        <a href="{{ route('shop') }}"><img src="{{ asset('images/promo-combo.jpg') }}" alt="Best offers"></a>
-        <a href="{{ route('shop') }}"><img src="{{ asset('images/promo-delivery.jpg') }}" alt="Same day delivery"></a>
-        <a href="{{ $categoryUrl('customized-items') }}"><img src="{{ asset('images/promo-custom.jpg') }}" alt="Custom creations"></a>
-    </div>
-</section>
-
-<section class="landing-section landing-why">
-    <div class="landing-container">
-        <h2 class="landing-title">Why Choose <span>Party Poppers?</span></h2>
-        <div class="landing-why-grid">
-            <div><span>🎁</span><h3>Wide Range of Products</h3><p>Everything for Every Occasion</p></div>
-            <div><span>🏷</span><h3>Affordable Prices</h3><p>Best Value for Money</p></div>
-            <div><span>💌</span><h3>Custom & Personalization</h3><p>Make it Special</p></div>
-            <div><span>🚚</span><h3>On-Time Delivery</h3><p>Guaranteed On-Time</p></div>
-            <div><span>🎧</span><h3>24/7 Customer Support</h3><p>We're Here to Help</p></div>
+    <section class="reviews section" id="reviews">
+        <div class="section-heading"><h2>What our clients say</h2><a href="#reviews">View more reviews on Google &#8594;</a></div>
+        <div class="review-grid">
+            <blockquote><span>&ldquo;</span><p>Gani were excellent from start to finish. Great communication and a fantastic result on our letting. Highly recommend.</p><footer><strong>Sarah M.</strong><small>Balham, SW12</small></footer></blockquote>
+            <blockquote><span>&ldquo;</span><p>The team are professional, friendly and always quick to respond. Our flat let within days.</p><footer><strong>James T.</strong><small>Tooting, SW17</small></footer></blockquote>
+            <blockquote><span>&ldquo;</span><p>Honest advice and no hard sell. A refreshing experience with real local knowledge.</p><footer><strong>Priya S.</strong><small>Streatham, SW16</small></footer></blockquote>
         </div>
-    </div>
-</section>
+    </section>
+
+    <section class="valuation" id="valuation">
+        <div><h2>Your local property move starts here</h2><p>Book a free, no-obligation valuation with our Balham experts.</p></div>
+        <a class="button button-white" href="{{ route('contact') }}">Book a free valuation</a>
+        <a class="phone" href="tel:02086737778"><svg class="icon"><use href="#icon-phone"/></svg>020 8673 7778</a>
+    </section>
+</main>
 @endsection
