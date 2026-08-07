@@ -31,6 +31,7 @@ Route::prefix('dashboard')->name('admin.')->middleware(['auth','admin'])->group(
     Route::post('/pages', [AdminPageController::class,'store'])->name('pages.store');
     Route::get('/pages/{page}/edit', [AdminPageController::class,'edit'])->name('pages.edit');
     Route::put('/pages/{page}', [AdminPageController::class,'update'])->name('pages.update');
+    Route::delete('/pages/{page}', [AdminPageController::class,'destroy'])->name('pages.destroy');
     Route::get('/pages/{page}/customizer', [AdminPageCustomizerController::class,'edit'])->name('pages.customizer');
     Route::get('/pages/{page}/customizer/schema', [AdminPageCustomizerController::class,'schema'])->name('pages.customizer.schema');
     Route::get('/pages/{page}/customizer/template', [AdminPageCustomizerController::class,'template'])->name('pages.customizer.template');

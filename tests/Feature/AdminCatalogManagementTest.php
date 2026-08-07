@@ -218,6 +218,62 @@ class AdminCatalogManagementTest extends TestCase
         $this->actingAs($admin)->get("/dashboard/pages/{$page->id}/edit")->assertOk()->assertSee('Dummy about content.');
     }
 
+    public function test_admin_can_permanently_delete_pages_without_deleting_customizer_files(): void
+    {
+        Storage::fake('local');
+        $admin = $this->admin();
+        $page = Page::create([
+            'title' => 'Frequently Asked Questions',
+            'slug' => 'faq',
+            'content' => 'Temporary FAQ content.',
+            'position' => 10,
+            'is_active' => true,
+        ]);
+        $customizerPage = Page::create([
+            'title' => 'Temporary Customizer Page',
+            'slug' => 'temporary-customizer-page',
+            'customizer_template' => 'page-customizer/templates/temporary.json',
+            'position' => 11,
+            'is_active' => true,
+        ]);
+        Storage::disk('local')->put('page-customizer/templates/temporary.json', '{"name":"Saved customizer override"}');
+
+        $this->delete("/dashboard/pages/{$page->id}")->assertRedirect('/login');
+        $this->assertDatabaseHas('pages', ['id' => $page->id]);
+
+        $this->actingAs($admin)->get('/dashboard/pages')
+            ->assertOk()
+            ->assertSee('Delete')
+            ->assertSee('public URL will return 404');
+
+        $this->get('/faq')->assertOk();
+        $this->actingAs($admin)->delete("/dashboard/pages/{$page->id}")
+            ->assertRedirect('/dashboard/pages')
+            ->assertSessionHas('success', 'Page deleted permanently.');
+        $this->assertDatabaseMissing('pages', ['id' => $page->id]);
+        $this->get('/faq')->assertNotFound();
+
+        $this->actingAs($admin)->delete("/dashboard/pages/{$customizerPage->id}")
+            ->assertRedirect('/dashboard/pages');
+        $this->assertDatabaseMissing('pages', ['id' => $customizerPage->id]);
+        Storage::disk('local')->assertExists('page-customizer/templates/temporary.json');
+    }
+
+    public function test_admin_can_delete_a_seeded_page_without_deleting_its_bundled_template(): void
+    {
+        $this->seed();
+        $page = Page::where('slug', 'landlords')->firstOrFail();
+        $bundledTemplate = resource_path('page-customizer/templates/landlords.json');
+
+        $this->assertFileExists($bundledTemplate);
+        $this->actingAs($this->admin())->delete("/dashboard/pages/{$page->id}")
+            ->assertRedirect('/dashboard/pages');
+
+        $this->assertDatabaseMissing('pages', ['id' => $page->id]);
+        $this->get('/landlords')->assertNotFound();
+        $this->assertFileExists($bundledTemplate);
+    }
+
     public function test_landlords_page_is_rendered_and_editable_through_customizer(): void
     {
         Storage::fake('local');

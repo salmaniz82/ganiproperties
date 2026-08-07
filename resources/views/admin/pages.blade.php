@@ -13,7 +13,16 @@
             <td>{{ $page->customizer_template ? 'Customizer' : 'Default' }}</td>
             <td>{{ $page->position }}</td>
             <td><span class="badge {{ $page->is_active ? 'green' : 'gray' }}">{{ $page->is_active ? 'Published' : 'Draft' }}</span></td>
-            <td class="row-actions"><a class="preview-action" href="{{ route('pages.show', $page->slug) }}" target="_blank" title="Preview page" aria-label="Preview {{ $page->title }}">👁</a><a href="{{ route('admin.pages.edit', $page) }}">Edit</a>@if($page->customizer_template)<a href="{{ route('admin.pages.customizer', $page) }}">Page customizer</a>@endif</td>
+            <td class="row-actions">
+                <a class="preview-action" href="{{ route('pages.show', $page->slug) }}" target="_blank" title="Preview page" aria-label="Preview {{ $page->title }}">&#128065;</a>
+                <a href="{{ route('admin.pages.edit', $page) }}">Edit</a>
+                @if($page->customizer_template)<a href="{{ route('admin.pages.customizer', $page) }}">Page customizer</a>@endif
+                <form method="post" action="{{ route('admin.pages.destroy', $page) }}" onsubmit="return confirm('Permanently delete this page? Any navigation or footer link to its public URL will return 404. Customizer templates, saved overrides, and uploaded files will be kept.');">
+                    @csrf
+                    @method('DELETE')
+                    <button class="delete-action" type="submit">Delete</button>
+                </form>
+            </td>
         </tr>
         @endforeach
     </table></div>

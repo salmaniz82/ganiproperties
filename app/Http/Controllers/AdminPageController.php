@@ -35,6 +35,13 @@ class AdminPageController extends Controller
         return back()->with('success', 'Page updated.');
     }
 
+    public function destroy(Page $page)
+    {
+        $page->delete();
+
+        return redirect()->route('admin.pages')->with('success', 'Page deleted permanently.');
+    }
+
     private function validated(Request $request, ?Page $page = null): array
     {
         $data = $request->validate([
