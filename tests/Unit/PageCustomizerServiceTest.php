@@ -22,6 +22,17 @@ class PageCustomizerServiceTest extends TestCase
         $this->assertSame('banner', $landlords['sections']['hero']['type']);
         $this->assertSame('image-content', $landlords['sections']['intro']['type']);
         $this->assertSame('card-grid', $landlords['sections']['services']['type']);
+        $this->assertSame([
+            '/images/icons/key.svg',
+            '/images/icons/chat.svg',
+            '/images/icons/shield.svg',
+            '/images/icons/pin.svg',
+            '/images/icons/check.svg',
+            '/images/icons/heart.svg',
+        ], array_column($landlords['sections']['services']['data']['cards'], 'image'));
+        foreach ($landlords['sections']['services']['data']['cards'] as $card) {
+            $this->assertFileExists(public_path(ltrim($card['image'], '/')));
+        }
         $this->assertSame('feature-panel', $landlords['sections']['management']['type']);
         $this->assertSame('steps', $landlords['sections']['process']['type']);
         $this->assertSame('cta-banner', $landlords['sections']['cta']['type']);
@@ -46,5 +57,37 @@ class PageCustomizerServiceTest extends TestCase
             'Saved custom title',
             json_decode(file_get_contents(resource_path($path)), true)['title'],
         );
+    }
+
+    public function test_render_marks_repeated_component_instances_with_independent_preview_targets(): void
+    {
+        Storage::fake('local');
+
+        $customizer = app(PageCustomizerService::class);
+        $path = 'page-customizer/templates/repeated-sections.json';
+        $customizer->writeTemplate($path, [
+            'name' => 'Repeated sections',
+            'title' => 'Repeated sections',
+            'template' => 'page',
+            'order' => ['primary_cards', 'secondary_cards'],
+            'sections' => [
+                'primary_cards' => [
+                    'type' => 'card-grid',
+                    'disabled' => false,
+                    'data' => ['title' => 'Primary cards', 'cards' => []],
+                ],
+                'secondary_cards' => [
+                    'type' => 'card-grid',
+                    'disabled' => false,
+                    'data' => ['title' => 'Secondary cards', 'cards' => []],
+                ],
+            ],
+        ]);
+
+        $html = $customizer->render($path);
+
+        $this->assertStringContainsString('data-customizer-section-id="primary_cards"', $html);
+        $this->assertStringContainsString('data-customizer-section-id="secondary_cards"', $html);
+        $this->assertSame(2, substr_count($html, 'class="card-grid-section"'));
     }
 }

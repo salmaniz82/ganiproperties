@@ -216,6 +216,20 @@ class AdminCatalogManagementTest extends TestCase
         $page = Page::where('slug','about')->firstOrFail();
         $this->assertSame('AboutPage', $page->schema['@type']);
         $this->actingAs($admin)->get("/dashboard/pages/{$page->id}/edit")->assertOk()->assertSee('Dummy about content.');
+        $this->get('/about')->assertOk()->assertSee('Dummy about content.');
+    }
+
+    public function test_unpublished_dashboard_page_still_returns_not_found(): void
+    {
+        Page::create([
+            'title' => 'Unpublished Page',
+            'slug' => 'unpublished-page',
+            'content' => 'This content should not be public.',
+            'position' => 20,
+            'is_active' => false,
+        ]);
+
+        $this->get('/unpublished-page')->assertNotFound();
     }
 
     public function test_admin_can_permanently_delete_pages_without_deleting_customizer_files(): void
@@ -283,6 +297,8 @@ class AdminCatalogManagementTest extends TestCase
         $this->get('/landlords')->assertOk()
             ->assertSee('Property management, handled.')
             ->assertSee('Management from move-in to renewal')
+            ->assertSee('data-customizer-section-id="hero"', false)
+            ->assertSee('data-customizer-section-id="services"', false)
             ->assertSee('Book a landlord consultation');
 
         $this->actingAs($this->admin())
@@ -295,11 +311,13 @@ class AdminCatalogManagementTest extends TestCase
             ->assertOk()
             ->assertJsonFragment(['id' => 'banner'])
             ->assertJsonFragment(['id' => 'card-grid'])
+            ->assertJsonFragment(['type' => 'image', 'label' => 'Icon image'])
             ->assertJsonMissing(['id' => 'landlord-services']);
 
         $template = app(\App\Services\PageCustomizerService::class)->readTemplate($page->customizer_template);
         $template['order'] = ['hero', 'services', 'intro', 'management', 'process', 'cta'];
         $template['sections']['management']['disabled'] = true;
+        $template['sections']['services']['data']['cards'][0]['image'] = '/customizer/uploads/valuation-icon.png';
 
         $this->actingAs($this->admin())
             ->postJson("/dashboard/pages/{$page->id}/customizer/template", $template)
@@ -310,5 +328,18 @@ class AdminCatalogManagementTest extends TestCase
         $saved = app(\App\Services\PageCustomizerService::class)->readTemplate($page->customizer_template);
         $this->assertSame(['hero', 'services', 'intro', 'management', 'process', 'cta'], $saved['order']);
         $this->assertTrue($saved['sections']['management']['disabled']);
+        $this->assertSame('/customizer/uploads/valuation-icon.png', $saved['sections']['services']['data']['cards'][0]['image']);
+        $this->get('/landlords')->assertOk()->assertSee('/customizer/uploads/valuation-icon.png');
+
+        unset($saved['sections']['intro']);
+        $saved['order'] = array_values(array_filter($saved['order'], fn (string $id) => $id !== 'intro'));
+        $this->actingAs($this->admin())
+            ->postJson("/dashboard/pages/{$page->id}/customizer/template", $saved)
+            ->assertOk()
+            ->assertJson(['ok' => true]);
+
+        $savedWithoutIntro = app(\App\Services\PageCustomizerService::class)->readTemplate($page->customizer_template);
+        $this->assertArrayNotHasKey('intro', $savedWithoutIntro['sections']);
+        $this->assertNotContains('intro', $savedWithoutIntro['order']);
     }
 }

@@ -80,6 +80,7 @@ button:disabled {
 }
 .section-item.active { background: var(--blue-bg); color: var(--blue); }
 .section-item.hidden-section .section-title { color: #8b8f97; text-decoration: line-through; }
+.section-item.hidden-section { grid-template-columns: 34px 1fr 34px 34px; }
 .section-sortable-ghost {
   opacity: .4;
   background: var(--blue-bg);
@@ -123,6 +124,8 @@ button:disabled {
 .drag-handle { cursor: grab; }
 .drag-handle:active { cursor: grabbing; }
 .visibility-toggle.is-hidden { color: #9aa0a6; }
+.section-remove { color: #b64a55; }
+.section-remove:hover { background: #fff0f1; color: #922f3a; }
 .add-section-wrap {
   position: relative;
   padding: 12px;

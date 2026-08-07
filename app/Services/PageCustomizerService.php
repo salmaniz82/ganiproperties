@@ -147,8 +147,15 @@ class PageCustomizerService
 
         ob_start();
         include $file;
+        $html = (string) ob_get_clean();
+        $sectionAttribute = ' data-customizer-section-id="'.htmlspecialchars($sectionId, ENT_QUOTES, 'UTF-8').'"';
 
-        return (string) ob_get_clean();
+        return preg_replace_callback(
+            '/^(\s*<[a-z][^>]*)(>)/i',
+            fn (array $matches) => $matches[1].$sectionAttribute.$matches[2],
+            $html,
+            1,
+        ) ?? $html;
     }
 
     private function allSectionData(array $template): array

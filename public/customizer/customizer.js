@@ -86,9 +86,19 @@ function swapPreview(html) {
     nextPreview.removeAttribute('style');
     currentPreview.replaceWith(nextPreview);
     preview = nextPreview;
+    scrollPreviewToSection(activeId, false);
   }, { once: true });
 
   nextPreview.srcdoc = html;
+}
+
+function scrollPreviewToSection(sectionId, smooth = true) {
+  if (!sectionId || !preview?.contentDocument) return;
+
+  const target = Array.from(preview.contentDocument.querySelectorAll('[data-customizer-section-id]'))
+    .find((element) => element.dataset.customizerSectionId === sectionId);
+
+  target?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
 }
 
 const pathGet = (root, path) => path.reduce((value, key) => value?.[key], root);
@@ -141,6 +151,20 @@ function closeEditor() {
 function openEditor(id) {
   activeId = activeId === id ? null : id;
   openRepeaterItems = new Set();
+  render();
+  scrollPreviewToSection(activeId);
+}
+
+function removeSection(id) {
+  const section = sections.find((candidate) => candidate.id === id);
+  if (!section?.instance.disabled) return;
+  if (!window.confirm(`Remove this ${section.definition.name} section? It will be deleted when you save the page.`)) return;
+
+  delete page.sections[id];
+  page.order = page.order.filter((sectionId) => sectionId !== id);
+  if (activeId === id) activeId = null;
+  openRepeaterItems = new Set();
+  setDirty();
   render();
 }
 
@@ -256,7 +280,18 @@ function renderSectionList() {
       render();
     });
 
-    item.append(drag, title, visibility);
+    item.append(drag, title);
+    if (section.instance.disabled) {
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'icon-button section-action section-remove';
+      remove.innerHTML = icon('cross');
+      remove.setAttribute('aria-label', `Remove ${section.definition.name} section`);
+      remove.title = 'Remove section';
+      remove.addEventListener('click', () => removeSection(section.id));
+      item.appendChild(remove);
+    }
+    item.appendChild(visibility);
     sectionList.appendChild(item);
   });
 }

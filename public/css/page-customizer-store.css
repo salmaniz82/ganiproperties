@@ -80,6 +80,7 @@
 .page-customizer-content .card-grid-heading h2{margin:11px 0 0;font-size:39px;line-height:1.18}
 .page-customizer-content .card-grid-heading>p{max-width:510px;margin:0;color:#5c5961;font-size:15px;line-height:1.75}
 .page-customizer-content .customizer-card-grid .service-card{min-height:305px}
+.page-customizer-content .customizer-card-grid .service-card-icon{display:block;width:43px;height:43px;margin:0 0 28px;object-fit:contain}
 .page-customizer-content .feature-panel{background:var(--purple-dark);color:#fff}
 .page-customizer-content .feature-panel-inner{display:grid;grid-template-columns:.9fr 1.1fr;gap:100px;align-items:center;padding-top:75px;padding-bottom:78px}
 .page-customizer-content .feature-panel h2{margin:14px 0 18px;color:#fff}.page-customizer-content .feature-panel-inner>div>p:not(.eyebrow){color:#d2d1da;font-size:14px;line-height:1.8}.page-customizer-content .feature-panel .button{margin-top:17px}
