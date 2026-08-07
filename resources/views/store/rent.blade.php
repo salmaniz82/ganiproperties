@@ -66,7 +66,7 @@
                 <article class="property-card listing-card">
                     <a class="property-image" href="{{ route('property.show', $property['slug']) }}"><img src="{{ $property['image'] }}" alt="{{ $property['title'] }} in {{ $property['area'] }}" loading="lazy"><span class="property-status">{{ strtoupper($property['status']) }}</span></a>
                     <div class="property-info">
-                        <p class="property-type-label">{{ $property['type'] }}</p>
+                        <p class="property-type-label">{{ $property->is_commercial ? 'Commercial · ' : '' }}{{ $property['type'] }}</p>
                         <h3><a href="{{ route('property.show', $property['slug']) }}">{{ $property['title'] }}</a></h3>
                         <p>{{ $property['area'] }}, {{ $property['postcode'] }}</p>
                         <div class="details">

@@ -1,0 +1,1 @@
+{"id":"card-grid","name":"Card grid","schema":{"eyebrow":{"type":"text","label":"Eyebrow"},"title":{"type":"text","label":"Title"},"intro":{"type":"textarea","label":"Introduction"},"cards":{"type":"array","label":"Cards","item":{"number":{"type":"text","label":"Number"},"title":{"type":"text","label":"Title"},"text":{"type":"textarea","label":"Description"}}}}}

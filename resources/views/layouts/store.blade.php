@@ -33,6 +33,7 @@
         <nav class="desktop-nav" aria-label="Main navigation">
             <a href="{{ route('home') }}" @class(['is-active' => $activePage === 'home'])>Home</a>
             <a href="{{ route('rent') }}" @class(['is-active' => $activePage === 'rent'])>Rent</a>
+            <a href="{{ route('buy') }}" @class(['is-active' => $activePage === 'buy'])>Buy</a>
             <a href="{{ route('commercial') }}" @class(['is-active' => $activePage === 'commercial'])>Commercial</a>
             <a href="{{ route('landlords') }}" @class(['is-active' => $activePage === 'landlords'])>Landlords</a>
             <a href="{{ route('about') }}" @class(['is-active' => $activePage === 'about'])>About</a>
@@ -49,6 +50,7 @@
         <nav class="mobile-nav" id="mobile-navigation" aria-label="Mobile navigation">
             <a href="{{ route('home') }}" @class(['is-active' => $activePage === 'home'])>Home</a>
             <a href="{{ route('rent') }}" @class(['is-active' => $activePage === 'rent'])>Rent</a>
+            <a href="{{ route('buy') }}" @class(['is-active' => $activePage === 'buy'])>Buy</a>
             <a href="{{ route('commercial') }}" @class(['is-active' => $activePage === 'commercial'])>Commercial</a>
             <a href="{{ route('landlords') }}" @class(['is-active' => $activePage === 'landlords'])>Landlords</a>
             <a href="{{ route('about') }}" @class(['is-active' => $activePage === 'about'])>About</a>
@@ -70,7 +72,7 @@
             <p>Independent estate agents on Balham High Road, covering Balham, Tooting, Streatham and surrounding areas in South London.</p>
             <div class="socials"><a href="#" aria-label="Instagram"><svg><use href="#icon-instagram"/></svg></a><a href="#" aria-label="Facebook"><svg><use href="#icon-facebook"/></svg></a><a href="#" class="google" aria-label="Google">G</a></div>
         </div>
-        <div class="footer-column"><h3>Navigate</h3><a href="{{ route('rent') }}">Rent</a><a href="{{ route('commercial') }}">Commercial</a><a href="{{ route('landlords') }}">Landlords</a><a href="{{ route('pages.show', 'services') }}">Services</a><a href="{{ route('pages.show', 'events') }}">Events</a><a href="{{ route('about') }}">About</a><a href="{{ route('contact') }}">Contact</a></div>
+        <div class="footer-column"><h3>Navigate</h3><a href="{{ route('rent') }}">Rent</a><a href="{{ route('buy') }}">Buy</a><a href="{{ route('commercial') }}">Commercial</a><a href="{{ route('landlords') }}">Landlords</a><a href="{{ route('pages.show', 'services') }}">Services</a><a href="{{ route('pages.show', 'events') }}">Events</a><a href="{{ route('about') }}">About</a><a href="{{ route('contact') }}">Contact</a></div>
         <div class="footer-column"><h3>Helpful links</h3><a href="{{ route('contact') }}">Book a free valuation</a><a href="{{ route('rent') }}">Register for updates</a><a href="{{ route('about') }}#coverage">Area guides</a><a href="{{ route('pages.show', 'faq') }}">FAQ</a><a href="{{ route('pages.show', 'privacy-policy') }}">Privacy policy</a><a href="{{ route('pages.show', 'terms') }}">Terms &amp; conditions</a></div>
         <div class="footer-column"><h3>Contact</h3><p>142 Balham High Road<br>London SW12 9BW</p><a href="tel:02086737778">020 8673 7778</a><a href="mailto:hello@ganipropertyservices.co.uk">hello@ganipropertyservices.co.uk</a><p>Mon-Fri: 9am-6pm<br>Sat: 9am-4pm</p></div>
         <div class="copyright">&copy; GANI Property Services. All rights reserved <span id="year">{{ date('Y') }}</span></div>

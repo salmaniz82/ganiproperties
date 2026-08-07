@@ -1,37 +1,27 @@
 <?php
 
-use App\Http\Controllers\{AdminController, AdminCategoryController, AdminMediaController, AdminPageController, AdminPageCustomizerController, AdminProductController, AuthController, PageController, StaticFrontendController};
+use App\Http\Controllers\{AdminController, AdminMediaController, AdminPageController, AdminPageCustomizerController, AdminPropertyController, AuthController, PageController, StaticFrontendController};
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [StaticFrontendController::class, 'home'])->name('home');
 Route::get('/rent', [StaticFrontendController::class, 'rent'])->name('rent');
 Route::get('/rent/london/{area}/{type?}', [StaticFrontendController::class, 'rent'])->name('rent.area');
+Route::get('/buy', [StaticFrontendController::class, 'sale'])->name('buy');
+Route::get('/buy/london/{area}/{type?}', [StaticFrontendController::class, 'sale'])->name('buy.area');
+Route::get('/sell', fn () => redirect()->route('buy'))->name('sell');
 Route::get('/commercial', [StaticFrontendController::class, 'commercial'])->name('commercial');
 Route::get('/commercial/london/{area}/{rentPeriod?}', [StaticFrontendController::class, 'commercial'])->name('commercial.area');
 Route::get('/properties', fn () => redirect()->route('rent'))->name('properties');
 Route::get('/property/{slug}', [StaticFrontendController::class, 'property'])->name('property.show');
-Route::get('/landlords', [StaticFrontendController::class, 'landlords'])->name('landlords');
+Route::get('/landlords', [PageController::class, 'landlords'])->name('landlords');
 Route::get('/about-us', [StaticFrontendController::class, 'about'])->name('about');
 Route::get('/contact', [StaticFrontendController::class, 'contact'])->name('contact');
 Route::get('/login', [AuthController::class,'show'])->name('login');
 Route::post('/login', [AuthController::class,'login'])->name('login.store');
-Route::get('/register', [AuthController::class,'showRegister'])->name('register.show');
-Route::post('/register', [AuthController::class,'register'])->name('register');
 Route::post('/logout', [AuthController::class,'logout'])->name('logout');
 Route::prefix('dashboard')->name('admin.')->middleware(['auth','admin'])->group(function () {
     Route::get('/', [AdminController::class,'dashboard'])->name('dashboard');
-    Route::get('/products', [AdminProductController::class,'index'])->name('products');
-    Route::get('/products/create', [AdminProductController::class,'create'])->name('products.create');
-    Route::post('/products', [AdminProductController::class,'store'])->name('products.store');
-    Route::get('/products/{product}/edit', [AdminProductController::class,'edit'])->name('products.edit');
-    Route::put('/products/{product}', [AdminProductController::class,'update'])->name('products.update');
-    Route::delete('/products/{product}', [AdminProductController::class,'destroy'])->name('products.destroy');
-    Route::get('/categories', [AdminCategoryController::class,'index'])->name('categories');
-    Route::get('/categories/create', [AdminCategoryController::class,'create'])->name('categories.create');
-    Route::post('/categories', [AdminCategoryController::class,'store'])->name('categories.store');
-    Route::get('/categories/{category}/edit', [AdminCategoryController::class,'edit'])->name('categories.edit');
-    Route::put('/categories/{category}', [AdminCategoryController::class,'update'])->name('categories.update');
-    Route::delete('/categories/{category}', [AdminCategoryController::class,'destroy'])->name('categories.destroy');
+    Route::resource('properties', AdminPropertyController::class)->except('show');
     Route::get('/media', [AdminMediaController::class,'index'])->name('media');
     Route::post('/media', [AdminMediaController::class,'store'])->name('media.store');
     Route::put('/media/{media}', [AdminMediaController::class,'update'])->name('media.update');
@@ -47,12 +37,6 @@ Route::prefix('dashboard')->name('admin.')->middleware(['auth','admin'])->group(
     Route::post('/pages/{page}/customizer/template', [AdminPageCustomizerController::class,'save'])->name('pages.customizer.save');
     Route::post('/pages/{page}/customizer/upload', [AdminPageCustomizerController::class,'upload'])->name('pages.customizer.upload');
     Route::get('/pages/{page}/customizer/preview', [AdminPageCustomizerController::class,'preview'])->name('pages.customizer.preview');
-    Route::get('/orders', [AdminController::class,'orders'])->name('orders');
-    Route::put('/orders/{order}', [AdminController::class,'updateOrder'])->name('orders.update');
-    Route::get('/delivery-zones', [AdminController::class,'zones'])->name('zones');
-    Route::post('/delivery-zones', [AdminController::class,'saveZone'])->name('zones.save');
-    Route::get('/customers', [AdminController::class,'customers'])->name('customers');
     Route::get('/settings', [AdminController::class,'settings'])->name('settings');
-    Route::post('/promotions', [AdminController::class,'savePromotion'])->name('promotions.save');
 });
 Route::get('/{page:slug}', [PageController::class, 'show'])->name('pages.show');

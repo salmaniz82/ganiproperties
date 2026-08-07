@@ -14,7 +14,7 @@ class Media extends Model
 
     public function getUrlAttribute(): string
     {
-        return Storage::disk($this->disk)->url($this->path);
+        return '/'.ltrim($this->asset_path, '/');
     }
 
     public function getAssetPathAttribute(): string
@@ -24,12 +24,12 @@ class Media extends Model
 
     public function getWebpUrlAttribute(): ?string
     {
-        return $this->webp_path ? Storage::disk($this->disk)->url($this->webp_path) : null;
+        return $this->webp_path ? '/storage/'.ltrim($this->webp_path, '/') : null;
     }
 
     public function getThumbnailUrlAttribute(): string
     {
-        return Storage::disk($this->disk)->url($this->thumbnail_path ?: $this->webp_path ?: $this->path);
+        return '/storage/'.ltrim($this->thumbnail_path ?: $this->webp_path ?: $this->path, '/');
     }
 
     public static function variantAssetPath(?string $assetPath, string $variant = 'webp'): ?string

@@ -5,6 +5,11 @@ use App\Models\Page;
 
 class PageController extends Controller
 {
+    public function landlords()
+    {
+        return $this->show('landlords');
+    }
+
     public function show(string $slug)
     {
         $page = Page::where('slug', $slug)->where('is_active', true)->firstOrFail();

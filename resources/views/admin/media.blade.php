@@ -20,6 +20,6 @@
         </div>
         {{ $media->links() }}
     </div>
-    <form class="card form upload-card" method="post" action="{{ route('admin.media.store') }}" enctype="multipart/form-data">@csrf<h2>Upload new media</h2><div class="drop-zone"><b>Choose files</b><span>JPG, PNG, GIF, WebP, SVG, or PDF up to 10 MB</span><input type="file" name="files[]" multiple required></div><label class="check-row"><input type="hidden" name="optimize_webp" value="0"><input type="checkbox" name="optimize_webp" value="1" checked><span><b>Optimize images as WebP</b><small>Recommended. The original is kept and used automatically if conversion is unavailable.</small></span></label><button class="button">Upload files</button></form>
+    <form class="card form upload-card" method="post" action="{{ route('admin.media.store') }}" enctype="multipart/form-data">@csrf<h2>Upload new media</h2><div class="drop-zone"><b>Choose files</b><span>JPG, PNG, GIF, WebP, SVG, or PDF up to 10 MB</span><input type="file" name="files[]" multiple required data-media-upload-input></div><div class="upload-preview-grid" data-media-upload-preview hidden></div><label class="check-row"><input type="hidden" name="optimize_webp" value="0"><input type="checkbox" name="optimize_webp" value="1" checked><span><b>Optimize images as WebP</b><small>Recommended. The original is kept and used automatically if conversion is unavailable.</small></span></label><button class="button">Upload files</button></form>
 </div>
 @endsection

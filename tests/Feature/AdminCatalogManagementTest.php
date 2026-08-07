@@ -1,7 +1,7 @@
 <?php
 namespace Tests\Feature;
 
-use App\Models\{Category, Media, Page, Product, ProductVariant, User};
+use App\Models\{Media, Page, Property, User};
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -14,40 +14,6 @@ class AdminCatalogManagementTest extends TestCase
     private function admin(): User
     {
         return User::factory()->create(['is_admin' => true]);
-    }
-
-    public function test_admin_can_manage_nested_categories(): void
-    {
-        $admin = $this->admin();
-        $parent = Category::create(['name' => 'Events', 'slug' => 'events']);
-
-        $this->actingAs($admin)->post('/dashboard/categories', [
-            'name' => 'Birthdays', 'slug' => 'birthdays', 'parent_id' => $parent->id, 'position' => 1, 'is_active' => 1,
-        ])->assertRedirect('/dashboard/categories');
-
-        $child = Category::where('slug', 'birthdays')->firstOrFail();
-        $this->actingAs($admin)->get('/dashboard/categories')->assertOk()->assertSee('Level 2');
-        $this->actingAs($admin)->put("/dashboard/categories/{$child->id}", [
-            'name' => 'Birthday Parties', 'slug' => 'birthday-parties', 'parent_id' => $parent->id, 'position' => 2, 'is_active' => 1,
-        ])->assertRedirect();
-        $this->assertDatabaseHas('categories', ['id' => $child->id, 'name' => 'Birthday Parties', 'parent_id' => $parent->id]);
-    }
-
-    public function test_product_creation_and_editing_use_dedicated_routes(): void
-    {
-        $admin = $this->admin();
-        $this->actingAs($admin)->get('/dashboard/products')->assertOk()->assertSee('/dashboard/products/create', false)->assertDontSee('Add product');
-        $this->actingAs($admin)->get('/dashboard/products/create')->assertOk()->assertSee('Create product');
-
-        $this->actingAs($admin)->post('/dashboard/products', [
-            'name' => 'Confetti Set', 'slug' => 'confetti-set', 'sku' => 'CONF-1', 'price' => 1200, 'stock' => 10, 'is_active' => 1, 'track_inventory' => 1,
-            'meta_description' => 'A colorful confetti set.', 'meta_keywords' => 'confetti, parties', 'seo_schema' => '{"@context":"https://schema.org","@type":"Product"}',
-            'image' => 'storage/media/2026/06/hero.jpg', 'gallery_images' => ['storage/media/2026/06/one.jpg', 'storage/media/2026/06/two.jpg'],
-        ])->assertRedirect();
-        $product = Product::where('sku', 'CONF-1')->firstOrFail();
-        $this->assertSame(['storage/media/2026/06/one.jpg', 'storage/media/2026/06/two.jpg'], $product->gallery_images);
-        $this->actingAs($admin)->get("/dashboard/products/{$product->id}/edit")->assertOk()->assertSee('Confetti Set')->assertSee('Gallery images');
-        $this->get("/products/{$product->slug}")->assertOk()->assertSee('name="description"', false)->assertSee('application/ld+json', false);
     }
 
     public function test_admin_can_upload_and_update_media(): void
@@ -86,63 +52,139 @@ class AdminCatalogManagementTest extends TestCase
         Storage::disk('public')->assertExists($media->thumbnail_path);
     }
 
-    public function test_admin_can_create_variable_product_with_generated_variants(): void
+    public function test_dashboard_is_property_only_and_public_link_opens_new_tab(): void
     {
-        $admin = $this->admin();
+        $response = $this->actingAs($this->admin())->get('/dashboard');
 
-        $this->actingAs($admin)->post('/dashboard/products', [
-            'product_type' => 'variable',
-            'name' => 'Balloon Bundle',
-            'slug' => 'balloon-bundle',
-            'sku' => 'BUNDLE',
-            'price' => 1500,
-            'discount_price' => 1300,
-            'stock' => 0,
-            'track_inventory' => 1,
-            'variant_same_pricing' => 1,
-            'is_active' => 1,
-            'variant_options' => [
-                ['name' => 'Color', 'values' => 'Red, Blue'],
-                ['name' => 'Size', 'values' => 'Small, Large'],
-            ],
-            'variants' => [
-                ['name' => 'Red / Small', 'sku' => 'BUNDLE-RED-SMALL', 'price' => 1500, 'discount_price' => 1300, 'stock' => 5, 'options' => '{"Color":"Red","Size":"Small"}'],
-                ['name' => 'Blue / Large', 'sku' => 'BUNDLE-BLUE-LARGE', 'price' => 1500, 'discount_price' => 1300, 'stock' => 3, 'options' => '{"Color":"Blue","Size":"Large"}'],
-            ],
-        ])->assertRedirect();
-
-        $product = Product::where('sku', 'BUNDLE')->firstOrFail();
-        $this->assertSame('variable', $product->product_type);
-        $this->assertTrue($product->variant_same_pricing);
-        $this->assertCount(2, $product->variant_options);
-        $this->assertDatabaseHas('product_variants', ['product_id' => $product->id, 'sku' => 'BUNDLE-RED-SMALL', 'stock' => 5, 'discount_price' => 1300]);
-        $this->assertEquals(['Color' => 'Red', 'Size' => 'Small'], ProductVariant::where('sku', 'BUNDLE-RED-SMALL')->firstOrFail()->options);
+        $response->assertOk()
+            ->assertSee('View public')
+            ->assertSee('target="_blank"', false)
+            ->assertDontSee('>Products<', false)
+            ->assertDontSee('>Categories<', false)
+            ->assertDontSee('>Orders<', false)
+            ->assertDontSee('>Customers<', false)
+            ->assertDontSee('>Delivery zones<', false);
+        $this->actingAs($this->admin())->get('/dashboard/products')->assertNotFound();
+        $this->actingAs($this->admin())->get('/dashboard/categories')->assertNotFound();
+        $this->actingAs($this->admin())->get('/dashboard/orders')->assertNotFound();
+        $this->actingAs($this->admin())->get('/dashboard/customers')->assertNotFound();
+        $this->actingAs($this->admin())->get('/dashboard/delivery-zones')->assertNotFound();
+        $this->get('/register')->assertNotFound();
     }
 
-    public function test_variant_attribute_values_are_normalized_from_comma_lists(): void
+    public function test_admin_can_manage_property_listings_and_media(): void
     {
         $admin = $this->admin();
+        $featured = Media::create(['user_id' => $admin->id, 'disk' => 'public', 'path' => 'media/home.jpg', 'filename' => 'home.jpg', 'mime_type' => 'image/jpeg', 'size' => 1200]);
+        $gallery = Media::create(['user_id' => $admin->id, 'disk' => 'public', 'path' => 'media/kitchen.jpg', 'filename' => 'kitchen.jpg', 'mime_type' => 'image/jpeg', 'size' => 1200]);
 
-        $this->actingAs($admin)->post('/dashboard/products', [
-            'product_type' => 'variable',
-            'name' => 'Party Hat',
-            'slug' => 'party-hat',
-            'sku' => 'HAT',
-            'price' => 500,
-            'stock' => 0,
-            'is_active' => 1,
-            'variant_options' => [
-                ['name' => 'Color', 'values' => 'Red, Green, Blue'],
-                ['name' => 'Size', 'values' => 'Small, Medium, Large'],
-            ],
-            'variants' => [
-                ['name' => 'Red / Small', 'sku' => 'HAT-RED-SMALL', 'price' => 500, 'stock' => 1, 'options' => '{"Color":"Red","Size":"Small"}'],
+        $this->actingAs($admin)->get('/dashboard/properties/create')->assertOk()
+            ->assertSee('Create property')->assertSee('This is a commercial property')
+            ->assertSee('featured_image_upload', false)->assertSee('gallery_image_uploads[]', false)
+            ->assertDontSee('Media library');
+        $this->actingAs($admin)->post('/dashboard/properties', [
+            'title' => 'Test Mews', 'slug' => 'test-mews', 'reference' => 'GPS-T100', 'listing_type' => 'rent',
+            'status' => 'To let', 'type' => 'Mews house', 'area' => 'Balham', 'postcode' => 'SW12',
+            'price' => 2750, 'bedrooms' => 2, 'bathrooms' => 1, 'receptions' => 1,
+            'tenure' => 'Long let', 'council_tax' => 'Band D', 'epc' => 'C', 'floor_area' => '800 sq ft',
+            'featured_image' => $featured->asset_path, 'gallery_images' => [$gallery->asset_path],
+            'summary' => 'A bright test property.', 'description_text' => "First paragraph.\nSecond paragraph.",
+            'features_text' => "Private garden\nNear station", 'is_published' => 1,
+            'meta_title' => 'Test Mews to rent', 'meta_description' => 'SEO description for Test Mews.',
+            'meta_keywords' => 'test mews, Balham', 'seo_schema' => '{"@context":"https://schema.org","@type":"RealEstateListing"}',
+        ])->assertRedirect();
+
+        $property = Property::where('slug', 'test-mews')->firstOrFail();
+        $this->assertSame(['First paragraph.', 'Second paragraph.'], $property->description);
+        $this->assertSame([$gallery->asset_path], $property->gallery_images);
+        $this->get('/rent')->assertOk()->assertSee('Test Mews')->assertSee('&pound;2,750 pcm', false);
+        $this->get('/property/test-mews')->assertOk()->assertSee('Private garden')->assertSee('/'.$gallery->asset_path, false)
+            ->assertSee('<title>Test Mews to rent</title>', false)
+            ->assertSee('name="description" content="SEO description for Test Mews."', false)
+            ->assertSee('application/ld+json', false);
+        $this->actingAs($admin)->delete("/dashboard/media/{$featured->id}")->assertStatus(422);
+
+        $this->actingAs($admin)->put("/dashboard/properties/{$property->id}", [
+            'title' => 'Updated Mews', 'slug' => 'test-mews', 'reference' => 'GPS-T100', 'listing_type' => 'rent',
+            'status' => 'Let agreed', 'type' => 'Mews house', 'area' => 'Balham', 'postcode' => 'SW12',
+            'price' => 2800, 'bedrooms' => 2, 'bathrooms' => 1, 'receptions' => 1,
+            'summary' => 'Updated summary.', 'description_text' => 'Updated description.', 'features_text' => 'Near station',
+            'is_published' => 0,
+        ])->assertRedirect();
+        $this->assertDatabaseHas('properties', ['id' => $property->id, 'title' => 'Updated Mews', 'is_published' => false]);
+        $this->get('/property/test-mews')->assertNotFound();
+
+        $this->actingAs($admin)->delete("/dashboard/properties/{$property->id}")->assertRedirect('/dashboard/properties');
+        $this->assertDatabaseMissing('properties', ['id' => $property->id]);
+    }
+
+    public function test_property_form_uploads_featured_and_multiple_gallery_images_directly(): void
+    {
+        Storage::fake('public');
+        $admin = $this->admin();
+        $initialMediaCount = Media::count();
+
+        $this->actingAs($admin)->post('/dashboard/properties', [
+            'title' => 'Uploaded Home', 'slug' => 'uploaded-home', 'reference' => 'GPS-UP1', 'listing_type' => 'rent',
+            'status' => 'To let', 'type' => 'Apartment', 'area' => 'Balham', 'postcode' => 'SW12',
+            'price' => 2100, 'bedrooms' => 1, 'bathrooms' => 1, 'receptions' => 1,
+            'summary' => 'A directly uploaded property.', 'description_text' => 'Property description.',
+            'features_text' => 'One feature', 'is_published' => 1,
+            'featured_image_upload' => UploadedFile::fake()->image('featured.jpg', 1200, 800),
+            'gallery_image_uploads' => [
+                UploadedFile::fake()->image('living-room.jpg', 1000, 700),
+                UploadedFile::fake()->image('kitchen.jpg', 1000, 700),
             ],
         ])->assertRedirect();
 
-        $product = Product::where('sku', 'HAT')->firstOrFail();
-        $this->assertSame('Red, Green, Blue', $product->variant_options[0]['values']);
-        $this->assertSame('Small, Medium, Large', $product->variant_options[1]['values']);
+        $property = Property::where('slug', 'uploaded-home')->firstOrFail();
+        $this->assertStringStartsWith('storage/media/', $property->featured_image);
+        $this->assertCount(2, $property->gallery_images);
+        $this->assertSame($initialMediaCount + 3, Media::count());
+        foreach ([$property->featured_image, ...$property->gallery_images] as $assetPath) {
+            Storage::disk('public')->assertExists(substr($assetPath, 8));
+        }
+    }
+
+    public function test_commercial_page_uses_published_database_properties_and_filters(): void
+    {
+        Property::create([
+            'title' => 'High Street Shop', 'slug' => 'high-street-shop', 'reference' => 'GPS-C900',
+            'intent' => 'commercial', 'listing_type' => 'rent', 'is_commercial' => true, 'status' => 'To let', 'type' => 'Retail premises', 'area' => 'Streatham',
+            'postcode' => 'SW16', 'price' => 45000, 'rent_period' => 'Yearly', 'bathrooms' => 1,
+            'summary' => 'A visible retail unit.', 'is_published' => true, 'published_at' => now(),
+        ]);
+        Property::create([
+            'title' => 'Hidden Shop', 'slug' => 'hidden-shop', 'reference' => 'GPS-C901',
+            'intent' => 'commercial', 'listing_type' => 'rent', 'is_commercial' => true, 'status' => 'To let', 'type' => 'Retail premises', 'area' => 'Balham',
+            'postcode' => 'SW12', 'price' => 25000, 'rent_period' => 'Yearly', 'bathrooms' => 1,
+            'summary' => 'A draft unit.', 'is_published' => false,
+        ]);
+
+        $this->get('/commercial?location=Streatham')->assertOk()->assertSee('High Street Shop')->assertDontSee('Hidden Shop');
+        $this->get('/commercial?max_price=30000')->assertOk()->assertDontSee('High Street Shop');
+    }
+
+    public function test_sale_and_commercial_are_independent_and_published_is_immediate(): void
+    {
+        $sale = Property::create([
+            'title' => 'Residential Sale', 'slug' => 'residential-sale', 'reference' => 'GPS-S100',
+            'intent' => 'buy', 'listing_type' => 'sale', 'is_commercial' => false, 'status' => 'For sale',
+            'type' => 'Apartment', 'area' => 'Balham', 'postcode' => 'SW12', 'price' => 500000,
+            'bedrooms' => 2, 'bathrooms' => 1, 'receptions' => 1, 'summary' => 'A residential sale.',
+            'is_published' => true, 'published_at' => now()->addHours(5),
+        ]);
+        Property::create([
+            'title' => 'Commercial Sale', 'slug' => 'commercial-sale', 'reference' => 'GPS-CS100',
+            'intent' => 'commercial', 'listing_type' => 'sale', 'is_commercial' => true, 'status' => 'For sale',
+            'type' => 'Office', 'area' => 'Tooting', 'postcode' => 'SW17', 'price' => 750000,
+            'bathrooms' => 1, 'summary' => 'A commercial sale.', 'is_published' => true,
+        ]);
+
+        $this->get('/property/'.$sale->slug)->assertOk()->assertSee('Residential Sale');
+        $this->get('/buy')->assertOk()->assertSee('Residential Sale')->assertSee('Commercial Sale');
+        $this->get('/commercial?listing_type=sale')->assertOk()->assertSee('Commercial Sale')->assertDontSee('Residential Sale');
+        $this->get('/rent')->assertOk()->assertDontSee('Residential Sale');
     }
 
     public function test_admin_script_is_valid_javascript(): void
@@ -174,5 +216,43 @@ class AdminCatalogManagementTest extends TestCase
         $page = Page::where('slug','about')->firstOrFail();
         $this->assertSame('AboutPage', $page->schema['@type']);
         $this->actingAs($admin)->get("/dashboard/pages/{$page->id}/edit")->assertOk()->assertSee('Dummy about content.');
+    }
+
+    public function test_landlords_page_is_rendered_and_editable_through_customizer(): void
+    {
+        Storage::fake('local');
+        $this->seed();
+        $page = Page::where('slug', 'landlords')->firstOrFail();
+
+        $this->get('/landlords')->assertOk()
+            ->assertSee('Property management, handled.')
+            ->assertSee('Management from move-in to renewal')
+            ->assertSee('Book a landlord consultation');
+
+        $this->actingAs($this->admin())
+            ->get("/dashboard/pages/{$page->id}/customizer")
+            ->assertOk()
+            ->assertSee('page-customizer/templates/landlords.json');
+
+        $this->actingAs($this->admin())
+            ->get("/dashboard/pages/{$page->id}/customizer/schema")
+            ->assertOk()
+            ->assertJsonFragment(['id' => 'banner'])
+            ->assertJsonFragment(['id' => 'card-grid'])
+            ->assertJsonMissing(['id' => 'landlord-services']);
+
+        $template = app(\App\Services\PageCustomizerService::class)->readTemplate($page->customizer_template);
+        $template['order'] = ['hero', 'services', 'intro', 'management', 'process', 'cta'];
+        $template['sections']['management']['disabled'] = true;
+
+        $this->actingAs($this->admin())
+            ->postJson("/dashboard/pages/{$page->id}/customizer/template", $template)
+            ->assertOk()
+            ->assertJson(['ok' => true]);
+
+        Storage::disk('local')->assertExists('page-customizer/templates/landlords.json');
+        $saved = app(\App\Services\PageCustomizerService::class)->readTemplate($page->customizer_template);
+        $this->assertSame(['hero', 'services', 'intro', 'management', 'process', 'cta'], $saved['order']);
+        $this->assertTrue($saved['sections']['management']['disabled']);
     }
 }

@@ -18,6 +18,7 @@
     <section class="listing-filter-wrap" aria-label="Filter commercial properties">
         <form class="listing-filter listing-filter-commercial" action="{{ route('commercial') }}" method="get">
             <div class="listing-section-field"><span>Section</span><strong>Commercial</strong></div>
+            <label><span>Transaction</span><select name="listing_type"><option value="">Rent or buy</option><option value="rent" @selected($filters['listing_type'] === 'rent')>To rent</option><option value="sale" @selected($filters['listing_type'] === 'sale')>For sale</option></select></label>
             <label><span>Location</span><select name="location"><option value="">Any location</option>
                 @foreach($locations as $location)
                     <option value="{{ $location }}" @selected($filters['location'] === $location)>{{ $location }}</option>
@@ -28,7 +29,7 @@
                     <option value="{{ $period }}" @selected($filters['rent_period'] === $period)>{{ $period }}</option>
                 @endforeach
             </select></label>
-            <label><span>Max annual rent</span><select name="max_price"><option value="">No maximum</option>
+            <label><span>Max price</span><select name="max_price"><option value="">No maximum</option>
                 @foreach(['30000' => '&pound;30,000 pa', '50000' => '&pound;50,000 pa', '100000' => '&pound;100,000 pa'] as $value => $label)
                     <option value="{{ $value }}" @selected($filters['max_price'] === $value)>{!! $label !!}</option>
                 @endforeach
@@ -61,7 +62,7 @@
                     <article class="property-card listing-card">
                         <a class="property-image" href="{{ route('property.show', $property['slug']) }}"><img src="{{ $property['image'] }}" alt="{{ $property['title'] }} in {{ $property['area'] }}" loading="lazy"><span class="property-status">{{ strtoupper($property['status']) }}</span></a>
                         <div class="property-info">
-                            <p class="property-type-label">{{ $property['type'] }}</p>
+                            <p class="property-type-label">{{ $property->listing_type === 'sale' ? 'For sale' : 'To rent' }} · {{ $property['type'] }}</p>
                             <h3><a href="{{ route('property.show', $property['slug']) }}">{{ $property['title'] }}</a></h3>
                             <p>{{ $property['area'] }}, {{ $property['postcode'] }}</p>
                             <div class="details"><span>{{ $property['floor_area'] }}</span><span>{{ $property['tenure'] }}</span></div>

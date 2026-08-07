@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\{Category, Media, Product};
+use App\Models\{Media, Property};
 use App\Services\ImageVariantService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +18,7 @@ class AdminMediaController extends Controller
     public function store(Request $request, ImageVariantService $imageVariants)
     {
         $request->validate([
-            'files' => ['required'],
+            'files' => ['required', 'array', 'min:1', 'max:20'],
             'files.*' => ['file', 'mimes:jpg,jpeg,png,gif,webp,svg,pdf', 'max:10240'],
             'optimize_webp' => ['nullable', 'boolean'],
         ]);
@@ -53,9 +53,8 @@ class AdminMediaController extends Controller
     {
         $assetPath = $media->asset_path;
         abort_if(
-            Product::where('image', $assetPath)->exists()
-                || Product::whereJsonContains('gallery_images', $assetPath)->exists()
-                || Category::where('image', $assetPath)->exists(),
+            Property::where('featured_image', $assetPath)->exists()
+                || Property::whereJsonContains('gallery_images', $assetPath)->exists(),
             422,
             'This media item is currently in use.'
         );

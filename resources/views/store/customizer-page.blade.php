@@ -1,6 +1,7 @@
 @extends('layouts.store')
 @inject('customizer', 'App\Services\PageCustomizerService')
 @section('title', $page->meta_title ?: $page->title)
+@php($activePage = $page->slug)
 @section('meta')
 @if($page->meta_keywords)<meta name="keywords" content="{{ $page->meta_keywords }}">@endif
 <link rel="stylesheet" href="{{ asset('css/page-customizer-store.css') }}?v={{ filemtime(public_path('css/page-customizer-store.css')) }}">

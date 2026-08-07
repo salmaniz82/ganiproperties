@@ -2,7 +2,6 @@
 @section('title', 'Gani Property Services | Balham Estate Agents')
 @php
     $activePage = 'home';
-    $featuredProperties = collect(config('gani_properties', []))->where('intent', 'rent')->take(4);
 @endphp
 @section('content')
 <main id="top">
@@ -34,7 +33,7 @@
     <section class="section listings" id="listings">
         <div class="section-heading"><h2>Recently added rentals</h2><a href="{{ route('rent') }}">View all rentals &#8594;</a></div>
         <div class="property-grid">
-            @foreach($featuredProperties as $property)
+            @forelse($featuredProperties as $property)
                 <article class="property-card">
                     <a class="property-image" href="{{ route('property.show', $property['slug']) }}">
                         <img src="{{ $property['image'] }}" alt="{{ $property['title'] }} property" loading="lazy">
@@ -51,7 +50,9 @@
                         <div class="price"><strong>{!! $property['price_label'] !!}</strong><a class="card-arrow" href="{{ route('property.show', $property['slug']) }}" aria-label="View {{ $property['title'] }}">&#8594;</a></div>
                     </div>
                 </article>
-            @endforeach
+            @empty
+                <p>No rental properties are currently available. Please check back soon.</p>
+            @endforelse
         </div>
     </section>
 

@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
-use App\Models\DeliveryZone;
 use App\Models\Page;
-use App\Models\Product;
+use App\Models\Property;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -20,43 +18,35 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(['email'=>'app@ganiproperties.co.uk'],['name'=>'Gani Property Admin','phone'=>'02086737778','password'=>'password','is_admin'=>true]);
-        User::updateOrCreate(['email'=>'customer@example.com'],['name'=>'Demo Customer','phone'=>'03009876543','password'=>'password','is_admin'=>false]);
 
-        $categories = [
-            ['name'=>'Birthday Decorations','slug'=>'birthday-decorations','description'=>'Make your party extra special','image'=>'images/img-birthday-decor.jpg','position'=>1],
-            ['name'=>'Balloons','slug'=>'balloons','description'=>'Brighten every moment','image'=>'images/img-balloons.jpg','position'=>2],
-            ['name'=>'Gift Baskets','slug'=>'gift-baskets','description'=>'Happiness in a basket','image'=>'images/img-gift-basket.jpg','position'=>3],
-            ['name'=>'Flowers','slug'=>'flowers','description'=>'Fresh flowers, lasting smiles','image'=>'images/img-flower-bouquet.jpg','position'=>4],
-            ['name'=>'Chocolate Bouquets','slug'=>'chocolate-bouquets','description'=>'Sweetness wrapped with love','image'=>'images/img-chocolate-bouquet.jpg','position'=>5],
-            ['name'=>'Cakes & Treats','slug'=>'cakes','description'=>'Delicious creations','image'=>'images/img-cake-blue.jpg','position'=>6],
-            ['name'=>'Customized Items','slug'=>'customized-items','description'=>'Make it personal','image'=>'images/img-custom-mug.jpg','position'=>7],
-            ['name'=>'Party Supplies','slug'=>'party-supplies','description'=>'Everything you need to party','image'=>'images/img-party-supplies.jpg','position'=>8],
-        ];
-        foreach ($categories as $row) Category::updateOrCreate(['slug'=>$row['slug']],$row);
-        $catalog = [
-            ['Birthday Decorations','Balloon Arch Kit','balloon-arch-kit','PP-ARCH-01',2500,'images/prod-arch.jpg'],
-            ['Birthday Decorations','Happy Birthday Backdrop','birthday-backdrop','PP-BACK-01',3200,'images/prod-backdrop.jpg'],
-            ['Birthday Decorations','Neon Light Sign','neon-light-sign','PP-NEON-01',1800,'images/prod-neon.jpg'],
-            ['Birthday Decorations','Table Decoration Set','table-decoration-set','PP-TABLE-01',2000,'images/prod-table.jpg'],
-            ['Balloons','Foil Balloon Set','foil-balloon-set','PP-BAL-01',1200,'images/prod-balloon-set.jpg'],
-            ['Flowers','Rose Bouquet','rose-bouquet','PP-FLOW-01',2800,'images/prod-rose.jpg'],
-            ['Flowers','Sunflower Bouquet','sunflower-bouquet','PP-FLOW-02',2500,'images/prod-sunflower.jpg'],
-            ['Flowers','Lily Bouquet','lily-bouquet','PP-FLOW-03',3000,'images/prod-lily.jpg'],
-            ['Chocolate Bouquets','Ferrero Rocher Bouquet','ferrero-bouquet','PP-CHOC-01',3000,'images/prod-ferrero.jpg'],
-            ['Chocolate Bouquets','KitKat Bouquet','kitkat-bouquet','PP-CHOC-02',2200,'images/prod-kitkat.jpg'],
-            ['Chocolate Bouquets','Dairy Milk Bouquet','dairy-milk-bouquet','PP-CHOC-03',2500,'images/prod-dairy.jpg'],
-            ['Cakes & Treats','Birthday Cake','birthday-cake','PP-CAKE-01',2800,'images/prod-birthday-cake.jpg'],
-            ['Cakes & Treats','Chocolate Cake','chocolate-cake','PP-CAKE-02',2500,'images/prod-chocolate-cake.jpg'],
-            ['Cakes & Treats','Cupcakes Set','cupcakes-set','PP-CAKE-03',1500,'images/prod-cupcakes.jpg'],
-            ['Customized Items','Personalized Celebration Mug','personalized-mug','PP-CUSTOM-01',1600,'images/img-custom-mug.jpg'],
-        ];
-        foreach ($catalog as [$cat,$name,$slug,$sku,$price,$image]) Product::updateOrCreate(['sku'=>$sku],[
-            'category_id'=>Category::where('name',$cat)->value('id'),'name'=>$name,'slug'=>$slug,'description'=>"Premium $name prepared with care for your celebration.",
-            'price'=>$price,'stock'=>25,'image'=>$image,'is_active'=>true,'is_featured'=>true,
-            'customization_schema'=>$cat==='Customized Items'?['text'=>true,'option'=>true,'image'=>true]:null,
-        ]);
-        foreach ([['Lahore Central','Lahore',250,true,'15:00',0],['Karachi Central','Karachi',350,true,'14:00',0],['Islamabad & Rawalpindi','Islamabad',300,true,'15:00',0],['Nationwide Delivery','Other',500,false,null,3]] as [$name,$city,$fee,$same,$cutoff,$days]) {
-            DeliveryZone::updateOrCreate(['name'=>$name],['city'=>$city,'fee'=>$fee,'same_day_enabled'=>$same,'same_day_cutoff'=>$cutoff,'minimum_days'=>$days,'is_active'=>true]);
+        foreach (collect(config('gani_properties', []))->whereIn('intent', ['rent', 'commercial']) as $row) {
+            Property::updateOrCreate(['slug' => $row['slug']], [
+                'title' => $row['title'],
+                'reference' => $row['reference'],
+                'intent' => $row['intent'],
+                'listing_type' => $row['intent'] === 'rent' ? 'rent' : (str_contains(strtolower($row['status']), 'sale') ? 'sale' : 'rent'),
+                'is_commercial' => $row['intent'] === 'commercial',
+                'status' => $row['status'],
+                'type' => $row['type'],
+                'area' => $row['area'],
+                'postcode' => $row['postcode'],
+                'price' => $row['price'],
+                'rent_period' => $row['rent_period'] ?? null,
+                'bedrooms' => $row['bedrooms'],
+                'bathrooms' => $row['bathrooms'],
+                'receptions' => $row['receptions'],
+                'tenure' => $row['tenure'] ?? null,
+                'council_tax' => $row['council_tax'] ?? null,
+                'epc' => $row['epc'] ?? null,
+                'floor_area' => $row['floor_area'] ?? null,
+                'featured_image' => ltrim($row['image'], '/'),
+                'gallery_images' => [],
+                'summary' => $row['summary'],
+                'description' => $row['description'] ?? [],
+                'features' => $row['features'] ?? [],
+                'is_published' => true,
+                'published_at' => now(),
+            ]);
         }
 
         $pages = [
@@ -109,14 +99,15 @@ class DatabaseSeeder extends Seeder
         foreach ([
             ['Services','services',"Gani Property Services pages are managed through the JSON page customizer.\n\nDefault content fallback: use this page to describe lettings, guaranteed rent, property management, landlord advice and tenant support.\n\nThis text remains useful for search, exports and fallback rendering even when the visual customizer template is active.",'page-customizer/templates/services.json',6],
             ['Events','events',"Gani Property Services event and update content is managed through the JSON page customizer.\n\nDefault content fallback: describe landlord open days, valuation campaigns, rental market updates and local property events.\n\nThis text can be edited from the dashboard while the visible page body is controlled by flexible customizer sections.",'page-customizer/templates/events.json',7],
+            ['Landlords','landlords',"Property management and lettings support for landlords in Balham and South London.",'page-customizer/templates/landlords.json',8],
         ] as [$title,$slug,$content,$template,$position]) {
             Page::updateOrCreate(['slug'=>$slug],[
                 'title'=>$title,
                 'content'=>$content,
                 'customizer_template'=>$template,
-                'meta_title'=>$title.' | Gani Property Services',
-                'meta_keywords'=>strtolower($title).', gani property services, customizer page',
-                'schema'=>['@context'=>'https://schema.org','@type'=>'WebPage','name'=>$title],
+                'meta_title'=>$slug === 'landlords' ? 'Landlord & Property Management Services | Gani Property Services' : $title.' | Gani Property Services',
+                'meta_keywords'=>$slug === 'landlords' ? 'landlord services, property management, lettings management, Balham estate agents' : strtolower($title).', gani property services, customizer page',
+                'schema'=>['@context'=>'https://schema.org','@type'=>$slug === 'landlords' ? 'Service' : 'WebPage','name'=>$slug === 'landlords' ? 'Landlord and property management services' : $title],
                 'position'=>$position,
                 'is_active'=>true,
             ]);

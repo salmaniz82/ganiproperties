@@ -1,13 +1,23 @@
 @extends('layouts.store')
-@section('title', $property['title'].', '.$property['area'].' | Gani Property Services')
+@section('title', $property->meta_title ?: $property['title'].', '.$property['area'].' | Gani Property Services')
+@section('meta')
+<meta name="description" content="{{ $property->meta_description ?: $property->summary }}">
+@if($property->meta_keywords)<meta name="keywords" content="{{ $property->meta_keywords }}">@endif
+@endsection
+@if($property->seo_schema)
+@push('structured-data')
+<script type="application/ld+json">{!! json_encode($property->seo_schema, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
+@endpush
+@endif
 @php
-    $isCommercial = $property['intent'] === 'commercial';
-    $activePage = $isCommercial ? 'commercial' : 'rent';
-    $listingRoute = $isCommercial ? route('commercial') : route('rent');
-    $listingLabel = $isCommercial ? 'Commercial' : 'Rent';
-    $priceCaption = $isCommercial ? 'Annual rent' : 'Monthly rent';
-    $gallery = collect([$property['image'], '/assets/property-1-ref.jpg', '/assets/property-2-ref.jpg', '/assets/property-3-ref.jpg', '/assets/property-4-ref.jpg'])->unique()->take(4)->values();
-    $contactUrl = route('contact', ['property' => $property['title'].', '.$property['area'], 'interest' => $isCommercial ? 'Commercial' : 'Renting']);
+    $isCommercial = $property->is_commercial;
+    $isSale = $property->listing_type === 'sale';
+    $activePage = $isCommercial ? 'commercial' : ($isSale ? 'buy' : 'rent');
+    $listingRoute = $isCommercial ? route('commercial') : ($isSale ? route('buy') : route('rent'));
+    $listingLabel = $isCommercial ? 'Commercial' : ($isSale ? 'Buy' : 'Rent');
+    $priceCaption = $isSale ? 'Guide price' : ($isCommercial ? 'Rent' : 'Monthly rent');
+    $gallery = collect($property['gallery'])->take(4)->values();
+    $contactUrl = route('contact', ['property' => $property['title'].', '.$property['area'], 'interest' => $isCommercial ? 'Commercial' : ($isSale ? 'Buying' : 'Renting')]);
 @endphp
 @section('content')
 <main id="top">
@@ -38,8 +48,8 @@
                 <div><svg><use href="#icon-shield"/></svg><strong>{{ $property['epc'] }}</strong><span>EPC rating</span></div>
             </div>
 
-            <article class="property-copy-block"><p class="eyebrow">PROPERTY OVERVIEW</p><h2>{{ $property['summary'] }}</h2>@foreach($property['description'] as $paragraph)<p>{{ $paragraph }}</p>@endforeach</article>
-            <article class="property-copy-block"><h2>Key features</h2><ul class="feature-list">@foreach($property['features'] as $feature)<li><svg><use href="#icon-check"/></svg>{{ $feature }}</li>@endforeach</ul></article>
+            <article class="property-copy-block"><p class="eyebrow">PROPERTY OVERVIEW</p><h2>{{ $property['summary'] }}</h2>@foreach($property['description'] ?? [] as $paragraph)<p>{{ $paragraph }}</p>@endforeach</article>
+            @if(!empty($property['features']))<article class="property-copy-block"><h2>Key features</h2><ul class="feature-list">@foreach($property['features'] as $feature)<li><svg><use href="#icon-check"/></svg>{{ $feature }}</li>@endforeach</ul></article>@endif
             <article class="property-copy-block"><h2>Property information</h2><dl class="property-information"><div><dt>Property type</dt><dd>{{ $property['type'] }}</dd></div><div><dt>Tenure</dt><dd>{{ $property['tenure'] }}</dd></div><div><dt>Approx. floor area</dt><dd>{{ $property['floor_area'] }}</dd></div><div><dt>Council tax</dt><dd>{{ $property['council_tax'] }}</dd></div><div><dt>EPC rating</dt><dd><span class="epc-badge epc-{{ strtolower($property['epc']) }}">{{ $property['epc'] }}</span></dd></div><div><dt>Reference</dt><dd>{{ $property['reference'] }}</dd></div></dl><p class="property-disclaimer">These particulars are intended as a guide only. Measurements are approximate and tenants should verify important information independently.</p></article>
             <article class="property-location-block"><div><p class="eyebrow">THE LOCATION</p><h2>{{ $property['area'] }}, {{ $property['postcode'] }}</h2><p>Well placed for local shops, cafes, green spaces and transport connections across South London and into central London.</p></div><div class="location-map-placeholder" aria-label="Map placeholder"><svg><use href="#icon-pin"/></svg><span>Map location</span><small>Exact position available from the agent</small></div></article>
         </div>

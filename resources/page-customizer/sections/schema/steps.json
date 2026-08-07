@@ -18,6 +18,18 @@
       "type": "text",
       "label": "CTA"
     },
+    "variant": {
+      "type": "text",
+      "label": "Layout variant"
+    },
+    "intro": {
+      "type": "textarea",
+      "label": "Introduction"
+    },
+    "note": {
+      "type": "textarea",
+      "label": "Note"
+    },
     "items": {
       "type": "array",
       "label": "Steps",

@@ -30,7 +30,4 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
         ];
     }
-
-    public function orders() { return $this->hasMany(Order::class); }
-    public function wishlistProducts() { return $this->belongsToMany(Product::class, 'wishlists')->withTimestamps(); }
 }
