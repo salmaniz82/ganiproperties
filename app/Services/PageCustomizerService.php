@@ -45,11 +45,12 @@ class PageCustomizerService
             return null;
         }
 
+        $bundled = $this->readBundledTemplate($path);
         $disk = Storage::disk('local');
         if ($disk->exists($path)) {
             $data = json_decode($disk->get($path), true);
 
-            return is_array($data) ? $data : null;
+            return is_array($data) ? $this->mergeBundledDataDefaults($data, $bundled) : null;
         }
 
         // Continue honoring customizations saved before templates became bundled resources.
@@ -57,13 +58,10 @@ class PageCustomizerService
         if (is_file($legacyOverride)) {
             $data = json_decode(File::get($legacyOverride), true);
 
-            return is_array($data) ? $data : null;
+            return is_array($data) ? $this->mergeBundledDataDefaults($data, $bundled) : null;
         }
 
-        $bundledTemplate = resource_path($path);
-        $data = is_file($bundledTemplate) ? json_decode(File::get($bundledTemplate), true) : null;
-
-        return is_array($data) ? $data : null;
+        return $bundled;
     }
 
     public function writeTemplate(string $path, array $payload): void
@@ -168,6 +166,97 @@ class PageCustomizerService
         }
 
         return $data;
+    }
+
+    private function readBundledTemplate(string $path): ?array
+    {
+        $file = resource_path($path);
+        $data = is_file($file) ? json_decode(File::get($file), true) : null;
+
+        return is_array($data) ? $data : null;
+    }
+
+    private function mergeBundledDataDefaults(array $saved, ?array $bundled): array
+    {
+        if (! $bundled || ! is_array($saved['sections'] ?? null)) {
+            return $saved;
+        }
+
+        foreach ($saved['sections'] as $id => &$section) {
+            $defaultSection = $bundled['sections'][$id] ?? null;
+            if (! is_array($section) || ! is_array($defaultSection)) {
+                continue;
+            }
+
+            if (($section['type'] ?? $id) !== ($defaultSection['type'] ?? $id)) {
+                continue;
+            }
+
+            $savedData = is_array($section['data'] ?? null) ? $section['data'] : [];
+            $defaultData = is_array($defaultSection['data'] ?? null) ? $defaultSection['data'] : [];
+            $section['data'] = $this->mergeMissingValues($savedData, $defaultData);
+        }
+        unset($section);
+
+        return $saved;
+    }
+
+    private function mergeMissingValues(array $saved, array $defaults): array
+    {
+        $savedIsList = array_is_list($saved);
+        $defaultsAreList = array_is_list($defaults);
+
+        if ($savedIsList && $defaultsAreList) {
+            foreach ($saved as $index => &$item) {
+                if (! is_array($item)) {
+                    continue;
+                }
+
+                $defaultItem = $this->matchingDefaultItem($item, $defaults, $index);
+                if (is_array($defaultItem)) {
+                    $item = $this->mergeMissingValues($item, $defaultItem);
+                }
+            }
+            unset($item);
+
+            return $saved;
+        }
+
+        if ($savedIsList !== $defaultsAreList) {
+            return $saved === [] && ! $defaultsAreList ? $defaults : $saved;
+        }
+
+        foreach ($defaults as $key => $default) {
+            if (! array_key_exists($key, $saved)) {
+                $saved[$key] = $default;
+                continue;
+            }
+
+            if (is_array($saved[$key]) && is_array($default)) {
+                $saved[$key] = $this->mergeMissingValues($saved[$key], $default);
+            }
+        }
+
+        return $saved;
+    }
+
+    private function matchingDefaultItem(array $savedItem, array $defaults, int $index): ?array
+    {
+        foreach (['id', 'number', 'handle', 'title'] as $identityKey) {
+            if (! isset($savedItem[$identityKey]) || ! is_scalar($savedItem[$identityKey])) {
+                continue;
+            }
+
+            foreach ($defaults as $defaultItem) {
+                if (is_array($defaultItem)
+                    && isset($defaultItem[$identityKey])
+                    && (string) $defaultItem[$identityKey] === (string) $savedItem[$identityKey]) {
+                    return $defaultItem;
+                }
+            }
+        }
+
+        return is_array($defaults[$index] ?? null) ? $defaults[$index] : null;
     }
 
     private function isAllowedTemplatePath(string $path): bool

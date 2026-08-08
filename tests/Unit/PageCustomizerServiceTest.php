@@ -59,6 +59,58 @@ class PageCustomizerServiceTest extends TestCase
         );
     }
 
+    public function test_bundled_data_backfills_old_overrides_without_restoring_deleted_content(): void
+    {
+        Storage::fake('local');
+
+        $customizer = app(PageCustomizerService::class);
+        $path = 'page-customizer/templates/landlords.json';
+        $oldOverride = json_decode(file_get_contents(resource_path($path)), true);
+        $oldOverride['sections']['services']['data']['title'] = 'Server-customized services title';
+        $oldOverride['sections']['services']['data']['cards'] = array_reverse(
+            array_slice($oldOverride['sections']['services']['data']['cards'], 0, 5),
+        );
+        foreach ($oldOverride['sections']['services']['data']['cards'] as &$card) {
+            unset($card['image']);
+        }
+        unset($card, $oldOverride['sections']['management']);
+        $oldOverride['order'] = array_values(array_filter(
+            $oldOverride['order'],
+            fn (string $id) => $id !== 'management',
+        ));
+        Storage::disk('local')->put($path, json_encode($oldOverride));
+
+        $effective = $customizer->readTemplate($path);
+
+        $this->assertSame('Server-customized services title', $effective['sections']['services']['data']['title']);
+        $this->assertSame(['05', '04', '03', '02', '01'], array_column($effective['sections']['services']['data']['cards'], 'number'));
+        $this->assertSame([
+            '/images/icons/check.svg',
+            '/images/icons/pin.svg',
+            '/images/icons/shield.svg',
+            '/images/icons/chat.svg',
+            '/images/icons/key.svg',
+        ], array_column($effective['sections']['services']['data']['cards'], 'image'));
+        $this->assertArrayNotHasKey('management', $effective['sections']);
+        $this->assertNotContains('management', $effective['order']);
+        $this->assertCount(5, $effective['sections']['services']['data']['cards']);
+    }
+
+    public function test_explicitly_cleared_saved_value_is_not_replaced_by_bundled_default(): void
+    {
+        Storage::fake('local');
+
+        $customizer = app(PageCustomizerService::class);
+        $path = 'page-customizer/templates/landlords.json';
+        $override = json_decode(file_get_contents(resource_path($path)), true);
+        $override['sections']['services']['data']['cards'][0]['image'] = '';
+        Storage::disk('local')->put($path, json_encode($override));
+
+        $effective = $customizer->readTemplate($path);
+
+        $this->assertSame('', $effective['sections']['services']['data']['cards'][0]['image']);
+    }
+
     public function test_render_marks_repeated_component_instances_with_independent_preview_targets(): void
     {
         Storage::fake('local');
