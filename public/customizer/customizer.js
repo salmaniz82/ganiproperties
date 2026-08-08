@@ -5,12 +5,23 @@ let activeId = null;
 let dirty = false;
 let sortable = null;
 let openRepeaterItems = new Set();
+let workflowState = { has_draft: false, draft_version: null, current_version: null, revisions: [] };
 
 const sectionList = document.querySelector('#sectionList');
 const fields = document.querySelector('#fields');
 const activeName = document.querySelector('#activeName');
 const saveState = document.querySelector('#saveState');
 const saveButton = document.querySelector('#saveButton');
+const publishButton = document.querySelector('#publishButton');
+const versionsButton = document.querySelector('#versionsButton');
+const draftStatus = document.querySelector('#draftStatus');
+const versionsDialog = document.querySelector('#versionsDialog');
+const versionList = document.querySelector('#versionList');
+const closeVersionsButton = document.querySelector('#closeVersionsButton');
+const closeVersionsFooterButton = document.querySelector('#closeVersionsFooterButton');
+const discardDraftButton = document.querySelector('#discardDraftButton');
+const draftPreviewLink = document.querySelector('#draftPreviewLink');
+const previewLabel = document.querySelector('#previewLabel');
 let preview = document.querySelector('#preview');
 const editPanel = document.querySelector('#editPanel');
 const closePanel = document.querySelector('#closePanel');
@@ -21,6 +32,10 @@ const endpoints = {
   schema: shell?.dataset.schemaUrl || 'section-schemas.php',
   template: shell?.dataset.templateUrl || 'page.json',
   save: shell?.dataset.saveUrl || 'save-page.php',
+  publish: shell?.dataset.publishUrl || 'publish-page.php',
+  revisions: shell?.dataset.revisionsUrl || 'page-revisions.php',
+  restore: shell?.dataset.restoreUrl || 'restore-page.php',
+  discard: shell?.dataset.discardUrl || 'discard-draft.php',
   upload: shell?.dataset.uploadUrl || 'upload-image.php',
   preview: shell?.dataset.previewUrl || 'index.php'
 };
@@ -58,7 +73,105 @@ function defaultDataForDefinition(definition) {
 const setDirty = () => {
   dirty = true;
   saveState.textContent = 'Unsaved changes';
+  renderWorkflowState();
 };
+
+function renderWorkflowState() {
+  if (draftStatus) {
+    draftStatus.textContent = dirty
+      ? 'Unsaved draft changes'
+      : workflowState.has_draft
+        ? 'Draft saved — not public'
+        : 'Published';
+  }
+  if (publishButton) publishButton.disabled = dirty || !workflowState.has_draft;
+  if (discardDraftButton) discardDraftButton.hidden = !workflowState.has_draft;
+  if (draftPreviewLink) draftPreviewLink.hidden = !workflowState.has_draft;
+  if (previewLabel) previewLabel.textContent = workflowState.has_draft ? 'Draft preview' : 'Published preview';
+}
+
+function formatVersionDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  }).formatToParts(date);
+  const part = (type) => parts.find((entry) => entry.type === type)?.value || '';
+  return `${part('day')}-${part('month')}-${part('year')}, ${part('hour')}:${part('minute')}:${part('second')} ${part('dayPeriod').toUpperCase()}`;
+}
+
+function renderVersions() {
+  if (!versionList) return;
+  versionList.innerHTML = '';
+
+  const versions = [
+    ...(workflowState.draft_version ? [workflowState.draft_version] : []),
+    ...(workflowState.current_version ? [workflowState.current_version] : []),
+    ...workflowState.revisions
+  ];
+
+  if (!versions.length) {
+    const empty = document.createElement('p');
+    empty.className = 'version-empty';
+    empty.textContent = 'No previous published versions yet.';
+    versionList.appendChild(empty);
+    return;
+  }
+
+  versions.forEach((revision) => {
+    const item = document.createElement('div');
+    item.className = `version-item${revision.draft ? ' draft-version' : ''}${revision.current ? ' current-version' : ''}`;
+
+    const details = document.createElement('div');
+    const date = document.createElement('span');
+    date.textContent = formatVersionDate(revision.created_at);
+    date.title = new Date(revision.created_at).toLocaleString();
+    details.append(date);
+
+    if (revision.draft) {
+      const previewDraft = document.createElement('a');
+      previewDraft.className = 'version-action-button preview-draft-button';
+      previewDraft.href = `${endpoints.preview}?preview_ts=${Date.now()}`;
+      previewDraft.target = '_blank';
+      previewDraft.rel = 'noopener';
+      previewDraft.setAttribute('aria-label', `Preview draft saved ${date.textContent}`);
+      previewDraft.title = 'Preview draft';
+      previewDraft.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.8"/></svg>';
+      item.append(details, previewDraft);
+      versionList.appendChild(item);
+      return;
+    }
+
+    if (revision.current) {
+      const current = document.createElement('span');
+      current.className = 'current-version-mark';
+      current.setAttribute('aria-label', 'Current published version');
+      current.title = 'Current published version';
+      current.innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9"/><path d="m6 10 2.5 2.5L14.5 7"/></svg>';
+      item.append(details, current);
+      versionList.appendChild(item);
+      return;
+    }
+
+    const restore = document.createElement('button');
+    restore.type = 'button';
+    restore.className = 'version-action-button restore-version-button';
+    restore.setAttribute('aria-label', `Restore ${date.textContent} as draft`);
+    restore.title = 'Restore as draft';
+    restore.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8H4V4"/><path d="M4.5 8A8 8 0 1 1 4 15"/></svg>';
+    restore.addEventListener('click', () => restoreRevision(revision.id));
+
+    item.append(details, restore);
+    versionList.appendChild(item);
+  });
+}
 
 async function refreshPreview() {
   try {
@@ -158,7 +271,7 @@ function openEditor(id) {
 function removeSection(id) {
   const section = sections.find((candidate) => candidate.id === id);
   if (!section?.instance.disabled) return;
-  if (!window.confirm(`Remove this ${section.definition.name} section? It will be deleted when you save the page.`)) return;
+  if (!window.confirm(`Remove this ${section.definition.name} section? It will be deleted from the draft when you save.`)) return;
 
   delete page.sections[id];
   page.order = page.order.filter((sectionId) => sectionId !== id);
@@ -467,17 +580,21 @@ function render() {
 }
 
 async function loadTemplate() {
-  const [schemaResponse, pageResponse] = await Promise.all([
+  const [schemaResponse, pageResponse, revisionsResponse] = await Promise.all([
     fetch(endpoints.schema + '?ts=' + Date.now(), { cache: 'no-store', credentials: 'same-origin' }),
-    fetch(endpoints.template + '?ts=' + Date.now(), { cache: 'no-store', credentials: 'same-origin' })
+    fetch(endpoints.template + '?ts=' + Date.now(), { cache: 'no-store', credentials: 'same-origin' }),
+    fetch(endpoints.revisions + '?ts=' + Date.now(), { cache: 'no-store', credentials: 'same-origin' })
   ]);
   schema = await schemaResponse.json();
   page = await pageResponse.json();
+  workflowState = await revisionsResponse.json();
   render();
+  renderVersions();
+  renderWorkflowState();
 }
 
 async function savePage() {
-  saveState.textContent = 'Saving...';
+  saveState.textContent = 'Saving draft...';
   const response = await fetch(endpoints.save, {
     method: 'POST',
     cache: 'no-store',
@@ -491,12 +608,90 @@ async function savePage() {
     return;
   }
   dirty = false;
-  saveState.textContent = result.saved_at ? `Saved ${result.saved_at}` : 'All changes saved';
+  workflowState.has_draft = true;
+  saveState.textContent = result.saved_at ? `Draft saved ${result.saved_at}` : 'Draft saved';
+  await loadTemplate();
+  await refreshPreview();
+}
+
+async function publishPage() {
+  if (dirty || !workflowState.has_draft) return;
+  if (!window.confirm('Publish this draft? The current public page will be saved as a restorable version.')) return;
+
+  saveState.textContent = 'Publishing...';
+  const response = await fetch(endpoints.publish, {
+    method: 'POST',
+    cache: 'no-store',
+    credentials: 'same-origin',
+    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken }
+  });
+  const result = await response.json().catch(() => ({ ok: false, message: 'Publish failed: server did not return JSON' }));
+  if (!response.ok || !result.ok) {
+    saveState.textContent = result.message || 'Publish failed';
+    return;
+  }
+
+  dirty = false;
+  saveState.textContent = result.published_at ? `Published ${result.published_at}` : 'Published';
+  await loadTemplate();
+  await refreshPreview();
+}
+
+async function restoreRevision(revisionId) {
+  if (!window.confirm('Restore this version as the current draft? Any existing draft changes will be replaced, but the public page will not change until Publish.')) return;
+
+  const response = await fetch(endpoints.restore, {
+    method: 'POST',
+    cache: 'no-store',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+    body: JSON.stringify({ revision: revisionId })
+  });
+  const result = await response.json().catch(() => ({ ok: false, message: 'Restore failed: server did not return JSON' }));
+  if (!response.ok || !result.ok) {
+    saveState.textContent = result.message || 'Restore failed';
+    return;
+  }
+
+  dirty = false;
+  saveState.textContent = 'Version restored as draft';
+  versionsDialog?.close();
+  await loadTemplate();
+  await refreshPreview();
+}
+
+async function discardDraft() {
+  if (!workflowState.has_draft) return;
+  if (!window.confirm('Discard the current saved draft and return the editor to the published page?')) return;
+
+  const response = await fetch(endpoints.discard, {
+    method: 'DELETE',
+    cache: 'no-store',
+    credentials: 'same-origin',
+    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken }
+  });
+  const result = await response.json().catch(() => ({ ok: false, message: 'Discard failed: server did not return JSON' }));
+  if (!response.ok || !result.ok) {
+    saveState.textContent = result.message || 'Discard failed';
+    return;
+  }
+
+  dirty = false;
+  saveState.textContent = 'Draft discarded';
+  versionsDialog?.close();
   await loadTemplate();
   await refreshPreview();
 }
 
 saveButton.addEventListener('click', savePage);
+publishButton.addEventListener('click', publishPage);
+versionsButton.addEventListener('click', () => {
+  renderVersions();
+  versionsDialog?.showModal();
+});
+closeVersionsButton.addEventListener('click', () => versionsDialog?.close());
+closeVersionsFooterButton.addEventListener('click', () => versionsDialog?.close());
+discardDraftButton.addEventListener('click', discardDraft);
 closePanel.addEventListener('click', closeEditor);
 addSectionButton.addEventListener('click', () => {
   addSectionMenu.hidden = !addSectionMenu.hidden;

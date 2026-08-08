@@ -293,6 +293,7 @@ class AdminCatalogManagementTest extends TestCase
         Storage::fake('local');
         $this->seed();
         $page = Page::where('slug', 'landlords')->firstOrFail();
+        $admin = $this->admin();
 
         $this->get('/landlords')->assertOk()
             ->assertSee('Property management, handled.')
@@ -301,12 +302,14 @@ class AdminCatalogManagementTest extends TestCase
             ->assertSee('data-customizer-section-id="services"', false)
             ->assertSee('Book a landlord consultation');
 
-        $this->actingAs($this->admin())
+        $this->actingAs($admin)
             ->get("/dashboard/pages/{$page->id}/customizer")
             ->assertOk()
-            ->assertSee('page-customizer/templates/landlords.json');
+            ->assertSee('Save draft')
+            ->assertSee('Publish')
+            ->assertSee('Versions');
 
-        $this->actingAs($this->admin())
+        $this->actingAs($admin)
             ->get("/dashboard/pages/{$page->id}/customizer/schema")
             ->assertOk()
             ->assertJsonFragment(['id' => 'banner'])
@@ -319,27 +322,84 @@ class AdminCatalogManagementTest extends TestCase
         $template['sections']['management']['disabled'] = true;
         $template['sections']['services']['data']['cards'][0]['image'] = '/customizer/uploads/valuation-icon.png';
 
-        $this->actingAs($this->admin())
+        $this->actingAs($admin)
             ->postJson("/dashboard/pages/{$page->id}/customizer/template", $template)
             ->assertOk()
-            ->assertJson(['ok' => true]);
+            ->assertJson(['ok' => true, 'message' => 'Draft saved']);
+
+        $customizer = app(\App\Services\PageCustomizerService::class);
+        Storage::disk('local')->assertExists('page-customizer/drafts/landlords.json');
+        Storage::disk('local')->assertMissing('page-customizer/templates/landlords.json');
+        $draft = $customizer->readDraftTemplate($page->customizer_template);
+        $this->assertSame(['hero', 'services', 'intro', 'management', 'process', 'cta'], $draft['order']);
+        $this->assertTrue($draft['sections']['management']['disabled']);
+        $this->assertSame('/customizer/uploads/valuation-icon.png', $draft['sections']['services']['data']['cards'][0]['image']);
+        $this->get('/landlords')->assertOk()->assertDontSee('/customizer/uploads/valuation-icon.png');
+        $this->actingAs($admin)->get("/dashboard/pages/{$page->id}/customizer/preview")
+            ->assertOk()
+            ->assertSee('/customizer/uploads/valuation-icon.png');
+
+        $publishResponse = $this->actingAs($admin)
+            ->postJson("/dashboard/pages/{$page->id}/customizer/publish")
+            ->assertOk()
+            ->assertJson(['ok' => true, 'message' => 'Published']);
+        $revision = $publishResponse->json('revision');
 
         Storage::disk('local')->assertExists('page-customizer/templates/landlords.json');
-        $saved = app(\App\Services\PageCustomizerService::class)->readTemplate($page->customizer_template);
-        $this->assertSame(['hero', 'services', 'intro', 'management', 'process', 'cta'], $saved['order']);
-        $this->assertTrue($saved['sections']['management']['disabled']);
-        $this->assertSame('/customizer/uploads/valuation-icon.png', $saved['sections']['services']['data']['cards'][0]['image']);
+        Storage::disk('local')->assertMissing('page-customizer/drafts/landlords.json');
+        Storage::disk('local')->assertExists("page-customizer/revisions/landlords/{$revision}.json");
         $this->get('/landlords')->assertOk()->assertSee('/customizer/uploads/valuation-icon.png');
 
-        unset($saved['sections']['intro']);
-        $saved['order'] = array_values(array_filter($saved['order'], fn (string $id) => $id !== 'intro'));
-        $this->actingAs($this->admin())
-            ->postJson("/dashboard/pages/{$page->id}/customizer/template", $saved)
-            ->assertOk()
-            ->assertJson(['ok' => true]);
+        $draft = $customizer->readTemplate($page->customizer_template);
+        unset($draft['sections']['intro']);
+        $draft['order'] = array_values(array_filter($draft['order'], fn (string $id) => $id !== 'intro'));
+        $this->actingAs($admin)
+            ->postJson("/dashboard/pages/{$page->id}/customizer/template", $draft)
+            ->assertOk();
 
-        $savedWithoutIntro = app(\App\Services\PageCustomizerService::class)->readTemplate($page->customizer_template);
-        $this->assertArrayNotHasKey('intro', $savedWithoutIntro['sections']);
-        $this->assertNotContains('intro', $savedWithoutIntro['order']);
+        $draftWithoutIntro = $customizer->readDraftTemplate($page->customizer_template);
+        $this->assertArrayNotHasKey('intro', $draftWithoutIntro['sections']);
+        $this->assertArrayHasKey('intro', $customizer->readTemplate($page->customizer_template)['sections']);
+        $this->get('/landlords')->assertOk()->assertSee('A hands-on team for hands-off ownership');
+        $this->actingAs($admin)->get("/dashboard/pages/{$page->id}/customizer/preview")
+            ->assertOk()
+            ->assertDontSee('A hands-on team for hands-off ownership');
+
+        $this->actingAs($admin)
+            ->get("/dashboard/pages/{$page->id}/customizer/revisions")
+            ->assertOk()
+            ->assertJsonPath('has_draft', true)
+            ->assertJsonPath('draft_version.draft', true)
+            ->assertJsonPath('current_version.current', true)
+            ->assertJsonPath('revisions.0.id', $revision);
+
+        $previewResponse = $this->actingAs($admin)
+            ->get("/dashboard/pages/{$page->id}/customizer/preview")
+            ->assertOk();
+        $this->assertStringContainsString('no-store', $previewResponse->headers->get('Cache-Control'));
+
+        $this->actingAs($admin)
+            ->postJson("/dashboard/pages/{$page->id}/customizer/revisions/restore", ['revision' => $revision])
+            ->assertOk()
+            ->assertJson(['ok' => true, 'message' => 'Version restored as draft']);
+        $restoredDraft = $customizer->readDraftTemplate($page->customizer_template);
+        $this->assertArrayHasKey('intro', $restoredDraft['sections']);
+        $this->assertSame('/images/icons/key.svg', $restoredDraft['sections']['services']['data']['cards'][0]['image']);
+        $this->get('/landlords')->assertOk()->assertSee('/customizer/uploads/valuation-icon.png');
+
+        $this->actingAs($admin)
+            ->deleteJson("/dashboard/pages/{$page->id}/customizer/draft")
+            ->assertOk()
+            ->assertJson(['ok' => true, 'message' => 'Draft discarded']);
+        $this->assertFalse($customizer->hasDraft($page->customizer_template));
+    }
+
+    public function test_customizer_draft_preview_requires_admin_authentication(): void
+    {
+        $this->seed();
+        $page = Page::where('slug', 'landlords')->firstOrFail();
+
+        $this->get("/dashboard/pages/{$page->id}/customizer/preview")
+            ->assertRedirect('/login');
     }
 }

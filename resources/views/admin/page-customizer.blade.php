@@ -11,15 +11,19 @@
   <link rel="stylesheet" href="{{ asset('customizer/customizer.css') }}?v={{ filemtime(public_path('customizer/customizer.css')) }}">
 </head>
 <body>
-  <div class="customizer-shell" data-schema-url="{{ route('admin.pages.customizer.schema', $page) }}" data-template-url="{{ route('admin.pages.customizer.template', $page) }}" data-save-url="{{ route('admin.pages.customizer.save', $page) }}" data-upload-url="{{ route('admin.pages.customizer.upload', $page) }}" data-preview-url="{{ route('admin.pages.customizer.preview', $page) }}">
+  <div class="customizer-shell" data-schema-url="{{ route('admin.pages.customizer.schema', $page) }}" data-template-url="{{ route('admin.pages.customizer.template', $page) }}" data-save-url="{{ route('admin.pages.customizer.save', $page) }}" data-publish-url="{{ route('admin.pages.customizer.publish', $page) }}" data-revisions-url="{{ route('admin.pages.customizer.revisions', $page) }}" data-restore-url="{{ route('admin.pages.customizer.restore', $page) }}" data-discard-url="{{ route('admin.pages.customizer.discard', $page) }}" data-upload-url="{{ route('admin.pages.customizer.upload', $page) }}" data-preview-url="{{ route('admin.pages.customizer.preview', $page) }}">
     <aside class="sidebar">
       <header>
         <div>
           <strong>{{ $page->title }}</strong>
-          <span>{{ $page->customizer_template }}</span>
+          <span id="draftStatus">Loading page state...</span>
         </div>
-        <button id="saveButton" type="button">Save</button>
+        <button id="versionsButton" type="button">Versions</button>
       </header>
+      <div class="workflow-actions">
+        <button id="saveButton" type="button">Save draft</button>
+        <button id="publishButton" type="button" disabled>Publish</button>
+      </div>
       <nav id="sectionList" class="section-list" aria-label="Sections"></nav>
       <div class="add-section-wrap">
         <button id="addSectionButton" class="add-section-button" type="button">
@@ -43,13 +47,29 @@
       </section>
       <section class="preview-wrap">
         <div class="preview-bar">
-          <span>Live preview</span>
-          <a href="{{ route('pages.show', $page->slug) }}" target="_blank">Open page</a>
+          <span id="previewLabel">Published preview</span>
+          <div class="preview-links">
+            <a id="draftPreviewLink" href="{{ route('admin.pages.customizer.preview', $page) }}" target="_blank" rel="noopener" hidden>Preview draft</a>
+            <a href="{{ route('pages.show', $page->slug) }}" target="_blank" rel="noopener">Open public page</a>
+          </div>
         </div>
         <iframe id="preview" src="{{ route('admin.pages.customizer.preview', $page) }}?preview_ts={{ time() }}" title="Page preview"></iframe>
       </section>
     </main>
   </div>
+  <dialog id="versionsDialog" class="versions-dialog">
+    <div class="versions-card">
+      <header>
+        <div><strong>Published versions</strong><span>Restore a previous public version into the draft editor.</span></div>
+        <button id="closeVersionsButton" class="icon-button" type="button" aria-label="Close versions">&times;</button>
+      </header>
+      <div id="versionList" class="version-list"></div>
+      <footer>
+        <button id="discardDraftButton" type="button" hidden>Discard current draft</button>
+        <button id="closeVersionsFooterButton" type="button">Close</button>
+      </footer>
+    </div>
+  </dialog>
   <script src="{{ asset('customizer/vendor/Sortable.min.js') }}?v={{ filemtime(public_path('customizer/vendor/Sortable.min.js')) }}"></script>
   <script src="{{ asset('customizer/customizer.js') }}?v={{ filemtime(public_path('customizer/customizer.js')) }}"></script>
 </body>

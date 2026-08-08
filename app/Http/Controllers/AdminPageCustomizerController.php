@@ -26,7 +26,7 @@ class AdminPageCustomizerController extends Controller
     {
         abort_unless($page->customizer_template, 404);
 
-        return response()->json($customizer->readTemplate($page->customizer_template))->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+        return response()->json($customizer->readDraftTemplate($page->customizer_template))->header('Cache-Control', 'no-store, no-cache, must-revalidate');
     }
 
     public function save(Request $request, Page $page, PageCustomizerService $customizer)
@@ -34,22 +34,72 @@ class AdminPageCustomizerController extends Controller
         abort_unless($page->customizer_template, 404);
         $payload = $this->validatedTemplate($request);
 
-        $customizer->writeTemplate($page->customizer_template, $payload);
+        $customizer->writeDraft($page->customizer_template, $payload);
 
         return response()->json([
             'ok' => true,
-            'message' => 'Saved',
-            'template_path' => $page->customizer_template,
+            'message' => 'Draft saved',
+            'draft_path' => 'page-customizer/drafts/'.basename($page->customizer_template),
             'saved_at' => now()->toIso8601String(),
         ])->header('Cache-Control', 'no-store, no-cache, must-revalidate');
     }
 
-    public function preview(Page $page)
+    public function publish(Page $page, PageCustomizerService $customizer)
+    {
+        abort_unless($page->customizer_template, 404);
+        $result = $customizer->publishDraft($page->customizer_template);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Published',
+            'revision' => $result['revision'],
+            'published_at' => now()->toIso8601String(),
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+    }
+
+    public function revisions(Page $page, PageCustomizerService $customizer)
     {
         abort_unless($page->customizer_template, 404);
 
+        return response()->json([
+            'has_draft' => $customizer->hasDraft($page->customizer_template),
+            'draft_version' => $customizer->currentDraftVersion($page->customizer_template),
+            'current_version' => $customizer->currentPublishedVersion($page->customizer_template),
+            'revisions' => $customizer->revisions($page->customizer_template),
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+    }
+
+    public function restore(Request $request, Page $page, PageCustomizerService $customizer)
+    {
+        abort_unless($page->customizer_template, 404);
+        $data = $request->validate(['revision' => ['required', 'string', 'max:100']]);
+        $customizer->restoreRevisionAsDraft($page->customizer_template, $data['revision']);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Version restored as draft',
+            'restored_at' => now()->toIso8601String(),
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+    }
+
+    public function discard(Page $page, PageCustomizerService $customizer)
+    {
+        abort_unless($page->customizer_template, 404);
+        $customizer->discardDraft($page->customizer_template);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Draft discarded',
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+    }
+
+    public function preview(Page $page, PageCustomizerService $customizer)
+    {
+        abort_unless($page->customizer_template, 404);
+        $customizerTemplate = $customizer->readDraftTemplate($page->customizer_template);
+
         return response()
-            ->view('store.customizer-page', compact('page'))
+            ->view('store.customizer-page', compact('page', 'customizerTemplate'))
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate');
     }
 

@@ -14,6 +14,6 @@
 @endif
 @section('content')
 <div class="page-customizer-content">
-    {!! $customizer->render($page->customizer_template) !!}
+    {!! isset($customizerTemplate) ? $customizer->renderTemplate($customizerTemplate) : $customizer->render($page->customizer_template) !!}
 </div>
 @endsection

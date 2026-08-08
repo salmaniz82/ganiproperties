@@ -111,6 +111,44 @@ class PageCustomizerServiceTest extends TestCase
         $this->assertSame('', $effective['sections']['services']['data']['cards'][0]['image']);
     }
 
+    public function test_draft_publish_revision_restore_and_discard_workflow(): void
+    {
+        Storage::fake('local');
+
+        $customizer = app(PageCustomizerService::class);
+        $path = 'page-customizer/templates/landlords.json';
+        $published = $customizer->readTemplate($path);
+        $draft = $published;
+        $draft['title'] = 'Draft landlord title';
+
+        $customizer->writeDraft($path, $draft);
+
+        Storage::disk('local')->assertExists('page-customizer/drafts/landlords.json');
+        $this->assertTrue($customizer->hasDraft($path));
+        $this->assertSame($published['title'], $customizer->readTemplate($path)['title']);
+        $this->assertSame('Draft landlord title', $customizer->readDraftTemplate($path)['title']);
+
+        $result = $customizer->publishDraft($path);
+
+        $this->assertFalse($customizer->hasDraft($path));
+        $this->assertSame('Draft landlord title', $customizer->readTemplate($path)['title']);
+        Storage::disk('local')->assertExists('page-customizer/revisions/landlords/'.$result['revision'].'.json');
+        $this->assertSame($result['revision'], $customizer->revisions($path)[0]['id']);
+
+        $nextDraft = $customizer->readTemplate($path);
+        $nextDraft['title'] = 'Another draft';
+        $customizer->writeDraft($path, $nextDraft);
+        $restored = $customizer->restoreRevisionAsDraft($path, $result['revision']);
+
+        $this->assertSame($published['title'], $restored['title']);
+        $this->assertSame('Draft landlord title', $customizer->readTemplate($path)['title']);
+
+        $customizer->discardDraft($path);
+
+        $this->assertFalse($customizer->hasDraft($path));
+        $this->assertSame('Draft landlord title', $customizer->readDraftTemplate($path)['title']);
+    }
+
     public function test_render_marks_repeated_component_instances_with_independent_preview_targets(): void
     {
         Storage::fake('local');

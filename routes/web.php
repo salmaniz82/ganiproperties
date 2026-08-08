@@ -36,6 +36,10 @@ Route::prefix('dashboard')->name('admin.')->middleware(['auth','admin'])->group(
     Route::get('/pages/{page}/customizer/schema', [AdminPageCustomizerController::class,'schema'])->name('pages.customizer.schema');
     Route::get('/pages/{page}/customizer/template', [AdminPageCustomizerController::class,'template'])->name('pages.customizer.template');
     Route::post('/pages/{page}/customizer/template', [AdminPageCustomizerController::class,'save'])->name('pages.customizer.save');
+    Route::post('/pages/{page}/customizer/publish', [AdminPageCustomizerController::class,'publish'])->name('pages.customizer.publish');
+    Route::get('/pages/{page}/customizer/revisions', [AdminPageCustomizerController::class,'revisions'])->name('pages.customizer.revisions');
+    Route::post('/pages/{page}/customizer/revisions/restore', [AdminPageCustomizerController::class,'restore'])->name('pages.customizer.restore');
+    Route::delete('/pages/{page}/customizer/draft', [AdminPageCustomizerController::class,'discard'])->name('pages.customizer.discard');
     Route::post('/pages/{page}/customizer/upload', [AdminPageCustomizerController::class,'upload'])->name('pages.customizer.upload');
     Route::get('/pages/{page}/customizer/preview', [AdminPageCustomizerController::class,'preview'])->name('pages.customizer.preview');
     Route::get('/settings', [AdminController::class,'settings'])->name('settings');

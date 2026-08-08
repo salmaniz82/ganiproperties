@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 class PageCustomizerService
 {
     private const TEMPLATE_DIRECTORY = 'page-customizer/templates';
+    private const DRAFT_DIRECTORY = 'page-customizer/drafts';
+    private const REVISION_DIRECTORY = 'page-customizer/revisions';
 
     public function templates(): array
     {
@@ -68,6 +70,144 @@ class PageCustomizerService
     {
         abort_unless($this->isAllowedTemplatePath($path), 422);
 
+        $this->writeJson($path, $this->normalizeTemplate($payload));
+    }
+
+    public function readDraftTemplate(?string $path): ?array
+    {
+        if (! $path || ! $this->isAllowedTemplatePath($path)) {
+            return null;
+        }
+
+        $draftPath = $this->draftPath($path);
+        $disk = Storage::disk('local');
+        if (! $disk->exists($draftPath)) {
+            return $this->readTemplate($path);
+        }
+
+        $draft = json_decode($disk->get($draftPath), true);
+
+        return is_array($draft)
+            ? $this->mergeBundledDataDefaults($draft, $this->readBundledTemplate($path))
+            : $this->readTemplate($path);
+    }
+
+    public function writeDraft(string $path, array $payload): void
+    {
+        abort_unless($this->isAllowedTemplatePath($path), 422);
+
+        $this->writeJson($this->draftPath($path), $this->normalizeTemplate($payload));
+    }
+
+    public function hasDraft(string $path): bool
+    {
+        return $this->isAllowedTemplatePath($path)
+            && Storage::disk('local')->exists($this->draftPath($path));
+    }
+
+    public function discardDraft(string $path): void
+    {
+        abort_unless($this->isAllowedTemplatePath($path), 422);
+
+        Storage::disk('local')->delete($this->draftPath($path));
+    }
+
+    public function publishDraft(string $path): array
+    {
+        abort_unless($this->isAllowedTemplatePath($path), 422);
+        abort_unless($this->hasDraft($path), 422, 'There is no saved draft to publish.');
+
+        $published = $this->readTemplate($path);
+        $revision = $published ? $this->createRevision($path, $published) : null;
+        $draft = $this->readDraftTemplate($path);
+        abort_unless($draft, 422, 'The saved draft is invalid.');
+
+        $this->writeTemplate($path, $draft);
+        $this->discardDraft($path);
+
+        return [
+            'template' => $this->readTemplate($path),
+            'revision' => $revision,
+        ];
+    }
+
+    public function revisions(string $path): array
+    {
+        if (! $this->isAllowedTemplatePath($path)) {
+            return [];
+        }
+
+        $disk = Storage::disk('local');
+
+        return collect($disk->files($this->revisionDirectory($path)))
+            ->filter(fn (string $file) => Str::endsWith($file, '.json'))
+            ->sortDesc()
+            ->map(fn (string $file) => [
+                'id' => basename($file, '.json'),
+                'created_at' => date(DATE_ATOM, $disk->lastModified($file)),
+            ])
+            ->values()
+            ->all();
+    }
+
+    public function currentPublishedVersion(string $path): ?array
+    {
+        if (! $this->isAllowedTemplatePath($path) || ! $this->readTemplate($path)) {
+            return null;
+        }
+
+        $disk = Storage::disk('local');
+        if ($disk->exists($path)) {
+            $timestamp = $disk->lastModified($path);
+        } else {
+            $bundledPath = resource_path($path);
+            $legacyPath = storage_path('app/'.$path);
+            $timestamp = is_file($legacyPath)
+                ? File::lastModified($legacyPath)
+                : (is_file($bundledPath) ? File::lastModified($bundledPath) : now()->timestamp);
+        }
+
+        return [
+            'created_at' => date(DATE_ATOM, $timestamp),
+            'current' => true,
+        ];
+    }
+
+    public function currentDraftVersion(string $path): ?array
+    {
+        if (! $this->hasDraft($path)) {
+            return null;
+        }
+
+        $disk = Storage::disk('local');
+        $draftPath = $this->draftPath($path);
+
+        return [
+            'created_at' => date(DATE_ATOM, $disk->lastModified($draftPath)),
+            'draft' => true,
+        ];
+    }
+
+    public function restoreRevisionAsDraft(string $path, string $revisionId): array
+    {
+        abort_unless($this->isAllowedTemplatePath($path), 422);
+        abort_unless((bool) preg_match('/^[a-z0-9_-]+$/i', $revisionId), 422, 'Invalid revision.');
+
+        $file = $this->revisionDirectory($path).'/'.$revisionId.'.json';
+        $disk = Storage::disk('local');
+        abort_unless($disk->exists($file), 404, 'Revision not found.');
+
+        $revision = json_decode($disk->get($file), true);
+        abort_unless(is_array($revision), 422, 'Revision is invalid.');
+
+        $this->writeDraft($path, $revision);
+
+        return $this->readDraftTemplate($path) ?? [];
+    }
+
+    private function normalizeTemplate(array $payload): array
+    {
+
         $page = [
             'name' => $payload['name'] ?? 'Custom page',
             'title' => $payload['title'] ?? '',
@@ -88,7 +228,7 @@ class PageCustomizerService
             ];
         }
 
-        Storage::disk('local')->put($path, json_encode($page, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL);
+        return $page;
     }
 
     public function sectionSchemas(): array
@@ -113,6 +253,12 @@ class PageCustomizerService
             return '';
         }
 
+        return $this->renderTemplate($template, $fullPage);
+    }
+
+    public function renderTemplate(array $template, bool $fullPage = false): string
+    {
+
         $allSections = $this->allSectionData($template);
         $html = '';
 
@@ -125,6 +271,32 @@ class PageCustomizerService
         }
 
         return $html;
+    }
+
+    private function writeJson(string $path, array $template): void
+    {
+        Storage::disk('local')->put(
+            $path,
+            json_encode($template, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL,
+        );
+    }
+
+    private function createRevision(string $path, array $template): string
+    {
+        $id = now()->format('Ymd-His-u').'-'.Str::lower(Str::random(4));
+        $this->writeJson($this->revisionDirectory($path).'/'.$id.'.json', $this->normalizeTemplate($template));
+
+        return $id;
+    }
+
+    private function draftPath(string $path): string
+    {
+        return self::DRAFT_DIRECTORY.'/'.basename($path);
+    }
+
+    private function revisionDirectory(string $path): string
+    {
+        return self::REVISION_DIRECTORY.'/'.basename($path, '.json');
     }
 
     private function renderSection(array $template, string $sectionId, array $allSections): string
