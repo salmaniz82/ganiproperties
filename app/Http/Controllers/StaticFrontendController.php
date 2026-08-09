@@ -9,16 +9,35 @@ use Illuminate\Support\Str;
 
 class StaticFrontendController extends Controller
 {
-    public function home()
+    public function home(Request $request)
     {
+        $properties = Property::published()->get();
+        $filters = [
+            'location' => trim((string) $request->query('location', '')),
+            'type' => trim((string) $request->query('type', '')),
+            'bedrooms' => trim((string) $request->query('bedrooms', '')),
+            'max_price' => trim((string) $request->query('max_price', '')),
+        ];
+
+        $featured = $properties
+            ->when($filters['location'] !== '', fn ($items) => $items->where('area', $filters['location']))
+            ->when($filters['type'] !== '', fn ($items) => $items->where('type', $filters['type']))
+            ->when($filters['bedrooms'] !== '', fn ($items) => $items->filter(fn ($property) => $property['bedrooms'] >= (int) $filters['bedrooms']))
+            ->when($filters['max_price'] !== '', fn ($items) => $items->filter(fn ($property) => $property['price'] <= (int) $filters['max_price']))
+            ->sortByDesc(fn (Property $property) => $property->published_at?->timestamp ?? $property->created_at->timestamp)
+            ->take(4);
+
         return view('store.home', [
-            'featuredProperties' => Property::published()->where('listing_type', 'rent')->latest('published_at')->take(4)->get(),
+            'featuredProperties' => $featured->values(),
+            'filters' => $filters,
+            'locations' => $properties->pluck('area')->unique()->sort()->values(),
+            'types' => $properties->where('is_commercial', false)->pluck('type')->unique()->sort()->values(),
         ]);
     }
 
     public function rent(Request $request, ?string $area = null, ?string $type = null)
     {
-        $properties = Property::published()->where('listing_type', 'rent')->get();
+        $properties = Property::published()->where('listing_type', 'rent')->where('is_commercial', false)->get();
         $areaName = $area ? $this->valueFromSlug($properties->pluck('area')->unique(), $area) : '';
         $typeName = $type ? $this->valueFromSlug($properties->pluck('type')->unique(), $type) : '';
         $filters = [
@@ -52,7 +71,7 @@ class StaticFrontendController extends Controller
 
     public function sale(Request $request, ?string $area = null, ?string $type = null)
     {
-        $properties = Property::published()->where('listing_type', 'sale')->get();
+        $properties = Property::published()->where('listing_type', 'sale')->where('is_commercial', false)->get();
         $areaName = $area ? $this->valueFromSlug($properties->pluck('area')->unique(), $area) : '';
         $typeName = $type ? $this->valueFromSlug($properties->pluck('type')->unique(), $type) : '';
         $filters = [

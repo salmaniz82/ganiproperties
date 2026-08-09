@@ -182,9 +182,33 @@ class AdminCatalogManagementTest extends TestCase
         ]);
 
         $this->get('/property/'.$sale->slug)->assertOk()->assertSee('Residential Sale');
-        $this->get('/buy')->assertOk()->assertSee('Residential Sale')->assertSee('Commercial Sale');
+        $this->get('/buy')->assertOk()->assertSee('Residential Sale')->assertDontSee('Commercial Sale');
         $this->get('/commercial?listing_type=sale')->assertOk()->assertSee('Commercial Sale')->assertDontSee('Residential Sale');
         $this->get('/rent')->assertOk()->assertDontSee('Residential Sale');
+    }
+
+    public function test_property_filter_has_page_defaults_and_home_only_all_option(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('data-property-filter', false)
+            ->assertSee('<option value="all" selected>All properties</option>', false);
+
+        $this->get('/rent')
+            ->assertOk()
+            ->assertSee('<option value="rent" selected>Rent</option>', false)
+            ->assertDontSee('All properties');
+
+        $this->get('/buy')
+            ->assertOk()
+            ->assertSee('<option value="buy" selected>Buy</option>', false)
+            ->assertDontSee('All properties');
+
+        $this->get('/commercial')
+            ->assertOk()
+            ->assertSee('<option value="commercial" selected>Commercial</option>', false)
+            ->assertSee('name="type" disabled', false)
+            ->assertDontSee('All properties');
     }
 
     public function test_admin_script_is_valid_javascript(): void

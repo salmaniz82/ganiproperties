@@ -11,20 +11,11 @@
             <nav class="breadcrumbs breadcrumbs-dark" aria-label="Breadcrumb"><a href="{{ route('home') }}">Home</a><span>/</span><span>Buy</span></nav>
             <p class="eyebrow">PROPERTY FOR SALE</p>
             <h1>Properties for sale</h1>
-            <p>Explore residential and commercial property for sale with practical local guidance from our team.</p>
+            <p>Explore residential property for sale with practical local guidance from our team.</p>
         </div>
     </section>
 
-    <section class="listing-filter-wrap" aria-label="Filter properties for sale">
-        <form class="listing-filter" action="{{ route('buy') }}" method="get">
-            <div class="listing-section-field"><span>Section</span><strong>Buy</strong></div>
-            <label><span>Location</span><select name="location"><option value="">Any location</option>@foreach($locations as $location)<option value="{{ $location }}" @selected($filters['location'] === $location)>{{ $location }}</option>@endforeach</select></label>
-            <label><span>Property type</span><select name="type"><option value="">Any type</option>@foreach($types as $type)<option value="{{ $type }}" @selected($filters['type'] === $type)>{{ $type }}</option>@endforeach</select></label>
-            <label><span>Min bedrooms</span><select name="bedrooms"><option value="">Any</option>@foreach([1, 2, 3, 4] as $bedrooms)<option value="{{ $bedrooms }}" @selected($filters['bedrooms'] === (string) $bedrooms)>{{ $bedrooms }}{{ $bedrooms === 4 ? '+' : '' }}</option>@endforeach</select></label>
-            <label><span>Max price</span><select name="max_price"><option value="">No maximum</option>@foreach(['350000' => '&pound;350,000', '550000' => '&pound;550,000', '750000' => '&pound;750,000', '1000000' => '&pound;1,000,000'] as $value => $label)<option value="{{ $value }}" @selected($filters['max_price'] === $value)>{!! $label !!}</option>@endforeach</select></label>
-            <button class="button" type="submit">Update results</button>
-        </form>
-    </section>
+    <x-property-filter page="buy" :$filters :$locations :$types />
 
     <section class="property-results section">
         <div class="results-toolbar">

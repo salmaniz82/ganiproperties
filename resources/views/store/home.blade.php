@@ -18,20 +18,10 @@
         </div>
     </section>
 
-    <form class="property-search" id="search" action="{{ route('rent') }}" method="get">
-        <fieldset class="search-tabs">
-            <legend class="visually-hidden">Listing type</legend>
-            <label><input type="radio" name="intent" value="rent" checked> <span>Rent</span></label>
-        </fieldset>
-        <label class="search-field"><span>Location</span><select name="location"><option value="">Any</option><option>Balham</option><option>Tooting</option><option>Streatham</option></select></label>
-        <label class="search-field"><span>Property type</span><select name="type"><option value="">Any</option><option>Apartment</option><option>Maisonette</option><option>Terraced house</option></select></label>
-        <label class="search-field"><span>Bedrooms</span><select name="bedrooms"><option value="">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option></select></label>
-        <label class="search-field"><span>Max price</span><select name="max_price"><option value="">Any</option><option value="1800">&pound;1,800 pcm</option><option value="2500">&pound;2,500 pcm</option><option value="3500">&pound;3,500 pcm</option></select></label>
-        <button class="button search-button" type="submit">Search</button>
-    </form>
+    <x-property-filter page="home" :$filters :$locations :$types />
 
     <section class="section listings" id="listings">
-        <div class="section-heading"><h2>Recently added rentals</h2><a href="{{ route('rent') }}">View all rentals &#8594;</a></div>
+        <div class="section-heading"><h2>Recently added properties</h2><a href="{{ route('rent') }}">View all properties &#8594;</a></div>
         <div class="property-grid">
             @forelse($featuredProperties as $property)
                 <article class="property-card">
@@ -51,7 +41,7 @@
                     </div>
                 </article>
             @empty
-                <p>No rental properties are currently available. Please check back soon.</p>
+                <p>No properties are currently available. Please check back soon.</p>
             @endforelse
         </div>
     </section>

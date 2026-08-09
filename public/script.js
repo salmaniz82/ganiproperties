@@ -3,7 +3,6 @@
 
   var menuButton = document.querySelector(".menu-toggle");
   var mobileNavigation = document.querySelector(".mobile-nav");
-  var searchForm = document.querySelector(".property-search");
   var notice = document.querySelector(".search-notice");
   var noticeTimer;
 
@@ -47,16 +46,36 @@
     });
   });
 
-  if (searchForm && notice) {
-    searchForm.addEventListener("submit", function (event) {
-      event.preventDefault();
-      var data = new FormData(searchForm);
-      var intent = data.get("intent") || "buy";
-      var location = data.get("location") || "Balham";
-      showNotice("Showing " + intent + " properties around " + location + ".");
-      document.getElementById("listings").scrollIntoView({ behavior: "smooth" });
-    });
-  }
+  document.querySelectorAll("[data-property-filter]").forEach(function (form) {
+    var sectionSelect = form.querySelector("[data-filter-section]");
+
+    function setGroupState(selector, enabled) {
+      form.querySelectorAll(selector).forEach(function (group) {
+        group.hidden = !enabled;
+        group.querySelectorAll("select, input").forEach(function (field) { field.disabled = !enabled; });
+      });
+    }
+
+    function updateFilter() {
+      var section = sectionSelect ? sectionSelect.value : "all";
+      var isCommercial = section === "commercial";
+      var priceSection = section === "all" ? "buy" : section;
+      var destination = form.getAttribute("data-" + section + "-url") || form.getAttribute("data-home-url");
+
+      form.setAttribute("action", destination);
+      setGroupState("[data-filter-residential]", !isCommercial);
+      setGroupState("[data-filter-commercial]", isCommercial);
+      form.querySelectorAll("[data-filter-price]").forEach(function (group) {
+        var enabled = group.getAttribute("data-filter-price") === priceSection;
+        group.hidden = !enabled;
+        group.querySelectorAll("select").forEach(function (field) { field.disabled = !enabled; });
+      });
+    }
+
+    if (sectionSelect) sectionSelect.addEventListener("change", updateFilter);
+    form.addEventListener("submit", updateFilter);
+    updateFilter();
+  });
 
   var galleryMainImage = document.querySelector(".gallery-main img");
   if (galleryMainImage) {

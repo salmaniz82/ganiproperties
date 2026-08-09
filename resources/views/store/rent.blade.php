@@ -15,32 +15,7 @@
         </div>
     </section>
 
-    <section class="listing-filter-wrap" aria-label="Filter properties">
-        <form class="listing-filter" action="{{ route('rent') }}" method="get">
-            <div class="listing-section-field"><span>Section</span><strong>Rent</strong></div>
-            <label><span>Location</span><select name="location"><option value="">Any location</option>
-                @foreach($locations as $location)
-                    <option value="{{ $location }}" @selected($filters['location'] === $location)>{{ $location }}</option>
-                @endforeach
-            </select></label>
-            <label><span>Property type</span><select name="type"><option value="">Any type</option>
-                @foreach($types as $type)
-                    <option value="{{ $type }}" @selected($filters['type'] === $type)>{{ $type }}</option>
-                @endforeach
-            </select></label>
-            <label><span>Min bedrooms</span><select name="bedrooms"><option value="">Any</option>
-                @foreach([1, 2, 3, 4] as $bedrooms)
-                    <option value="{{ $bedrooms }}" @selected($filters['bedrooms'] === (string) $bedrooms)>{{ $bedrooms }}{{ $bedrooms === 4 ? '+' : '' }}</option>
-                @endforeach
-            </select></label>
-            <label><span>Max price</span><select name="max_price"><option value="">No maximum</option>
-                @foreach(['1800' => '&pound;1,800 pcm', '2500' => '&pound;2,500 pcm', '3500' => '&pound;3,500 pcm'] as $value => $label)
-                    <option value="{{ $value }}" @selected($filters['max_price'] === $value)>{!! $label !!}</option>
-                @endforeach
-            </select></label>
-            <button class="button" type="submit">Update results</button>
-        </form>
-    </section>
+    <x-property-filter page="rent" :$filters :$locations :$types />
 
     <section class="property-results section">
         <div class="results-toolbar">
