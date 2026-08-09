@@ -38,9 +38,7 @@
             <a href="{{ route('landlords') }}" @class(['is-active' => $activePage === 'landlords'])>Landlords</a>
             <a href="{{ route('about') }}" @class(['is-active' => $activePage === 'about'])>About</a>
             <a href="{{ route('contact') }}" @class(['is-active' => $activePage === 'contact'])>Contact</a>
-            @guest
-                <a href="{{ route('login') }}" @class(['is-active' => $activePage === 'login'])>Login</a>
-            @endguest
+            
         </nav>
         <div class="header-actions">
             <a href="tel:02086737778"><svg class="icon"><use href="#icon-phone"/></svg>020 8673 7778</a>
@@ -55,9 +53,7 @@
             <a href="{{ route('landlords') }}" @class(['is-active' => $activePage === 'landlords'])>Landlords</a>
             <a href="{{ route('about') }}" @class(['is-active' => $activePage === 'about'])>About</a>
             <a href="{{ route('contact') }}" @class(['is-active' => $activePage === 'contact'])>Contact</a>
-            @guest
-                <a href="{{ route('login') }}">Login</a>
-            @endguest
+            
         </nav>
     </header>
 
