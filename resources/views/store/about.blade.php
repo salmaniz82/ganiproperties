@@ -90,10 +90,5 @@
         </div>
     </section>
 
-    <section>
-        <h3>GITHUB workflow : automation sync test</h3>
-    </section>
-
-
 </main>
 @endsection
