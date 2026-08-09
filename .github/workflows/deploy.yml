@@ -1,0 +1,49 @@
+name: Deploy Laravel Application to Development Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Test SSH Connection and Deployment Path
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          DEPLOY_PATH: ${{ vars.HOSTINGER_DEPLOY_PATH }}
+        with:
+          host: ${{ vars.HOSTINGER_HOST }}
+          username: ${{ vars.HOSTINGER_SSH_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: 65002
+          envs: DEPLOY_PATH
+          script: |
+            set -e
+
+            cd "$DEPLOY_PATH"
+
+            echo "Current directory: $(pwd)"
+
+            if [ ! -f artisan ]; then
+              echo "Error: artisan was not found. This does not appear to be the Laravel application root."
+              exit 1
+            fi
+
+            shopt -s expand_aliases
+            alias composer='/opt/alt/php85/usr/bin/php /usr/local/bin/composer2'
+            alias php='/opt/alt/php85/usr/bin/php'
+
+            echo "PHP version:"
+            php -v
+
+            echo "Composer version:"
+            composer --version
+
+            printf 'hello world!\n' > hello.txt
+
+            echo "Created hello.txt:"
+            ls -l hello.txt
+            cat hello.txt
