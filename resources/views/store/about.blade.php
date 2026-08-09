@@ -89,5 +89,11 @@
             <a class="about-cta-phone" href="tel:02086737778"><svg class="icon"><use href="#icon-phone"/></svg>020 8673 7778</a>
         </div>
     </section>
+
+    <section>
+        <h3>GITHUB workflow : automation sync test</h3>
+    </section>
+
+
 </main>
 @endsection

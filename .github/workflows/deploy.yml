@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test SSH Connection and Deployment Path
+      - name: Pull Changes and Deploy
         uses: appleboy/ssh-action@v1.2.0
         env:
           DEPLOY_PATH: ${{ vars.HOSTINGER_DEPLOY_PATH }}
@@ -25,25 +25,13 @@ jobs:
 
             cd "$DEPLOY_PATH"
 
-            echo "Current directory: $(pwd)"
-
-            if [ ! -f artisan ]; then
-              echo "Error: artisan was not found. This does not appear to be the Laravel application root."
-              exit 1
-            fi
-
             shopt -s expand_aliases
             alias composer='/opt/alt/php85/usr/bin/php /usr/local/bin/composer2'
             alias php='/opt/alt/php85/usr/bin/php'
 
-            echo "PHP version:"
-            php -v
+            git pull origin main
 
-            echo "Composer version:"
-            composer --version
-
-            printf 'hello world!\n' > hello.txt
-
-            echo "Created hello.txt:"
-            ls -l hello.txt
-            cat hello.txt
+            composer dump-autoload -o --no-dev
+            php artisan migrate --force
+            php artisan optimize:clear
+            php artisan optimize
