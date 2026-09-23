@@ -149,11 +149,6 @@ class StaticFrontendController extends Controller
         return view('store.property', compact('property', 'related'));
     }
 
-    public function about()
-    {
-        return view('store.about');
-    }
-
     public function contact(Request $request)
     {
         return view('store.contact', [

@@ -10,6 +10,11 @@ class PageController extends Controller
         return $this->show('landlords');
     }
 
+    public function about()
+    {
+        return $this->show('about');
+    }
+
     public function show(string $slug)
     {
         $page = Page::where('slug', $slug)->where('is_active', true)->firstOrFail();

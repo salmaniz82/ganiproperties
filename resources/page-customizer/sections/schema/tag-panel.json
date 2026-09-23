@@ -1,0 +1,18 @@
+{
+  "id": "tag-panel",
+  "name": "Tag panel",
+  "schema": {
+    "eyebrow": {"type": "text", "label": "Eyebrow"},
+    "title": {"type": "text", "label": "Title"},
+    "body": {"type": "textarea", "label": "Body"},
+    "list_label": {"type": "text", "label": "Tag list accessibility label"},
+    "items": {"type": "array", "label": "Tags", "item": {"label": {"type": "text", "label": "Label"}}}
+  },
+  "presets": {
+    "eyebrow": "Local knowledge",
+    "title": "Areas we know well",
+    "body": "Add an introduction to the locations or topics below.",
+    "list_label": "Areas covered",
+    "items": [{"label": "Example area"}]
+  }
+}

@@ -96,18 +96,29 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        Page::whereIn('slug', ['about-us', 'about-static'])->delete();
+
         foreach ([
             ['Services','services',"Gani Property Services pages are managed through the JSON page customizer.\n\nDefault content fallback: use this page to describe lettings, guaranteed rent, property management, landlord advice and tenant support.\n\nThis text remains useful for search, exports and fallback rendering even when the visual customizer template is active.",'page-customizer/templates/services.json',6],
             ['Events','events',"Gani Property Services event and update content is managed through the JSON page customizer.\n\nDefault content fallback: describe landlord open days, valuation campaigns, rental market updates and local property events.\n\nThis text can be edited from the dashboard while the visible page body is controlled by flexible customizer sections.",'page-customizer/templates/events.json',7],
             ['Landlords','landlords',"Property management and lettings support for landlords in Balham and South London.",'page-customizer/templates/landlords.json',8],
+            ['About Us','about',"Independent property advice, sales, lettings and management services from Gani Property Services in Balham.",'page-customizer/templates/about.json',9],
         ] as [$title,$slug,$content,$template,$position]) {
             Page::updateOrCreate(['slug'=>$slug],[
                 'title'=>$title,
                 'content'=>$content,
                 'customizer_template'=>$template,
-                'meta_title'=>$slug === 'landlords' ? 'Landlord & Property Management Services | Gani Property Services' : $title.' | Gani Property Services',
-                'meta_keywords'=>$slug === 'landlords' ? 'landlord services, property management, lettings management, Balham estate agents' : strtolower($title).', gani property services, customizer page',
-                'schema'=>['@context'=>'https://schema.org','@type'=>$slug === 'landlords' ? 'Service' : 'WebPage','name'=>$slug === 'landlords' ? 'Landlord and property management services' : $title],
+                'meta_title'=>match ($slug) {
+                    'landlords' => 'Landlord & Property Management Services | Gani Property Services',
+                    'about' => 'About Us | Gani Property Services',
+                    default => $title.' | Gani Property Services',
+                },
+                'meta_keywords'=>match ($slug) {
+                    'landlords' => 'landlord services, property management, lettings management, Balham estate agents',
+                    'about' => 'about Gani Property Services, independent estate agents, Balham estate agents, South London property experts',
+                    default => strtolower($title).', gani property services, customizer page',
+                },
+                'schema'=>['@context'=>'https://schema.org','@type'=>$slug === 'landlords' ? 'Service' : ($slug === 'about' ? 'AboutPage' : 'WebPage'),'name'=>$slug === 'landlords' ? 'Landlord and property management services' : $title],
                 'position'=>$position,
                 'is_active'=>true,
             ]);

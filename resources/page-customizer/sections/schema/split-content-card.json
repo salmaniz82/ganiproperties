@@ -1,0 +1,26 @@
+{
+  "id": "split-content-card",
+  "name": "Split content and card",
+  "schema": {
+    "eyebrow": {"type": "text", "label": "Content eyebrow"},
+    "title": {"type": "text", "label": "Content title"},
+    "body": {"type": "textarea", "label": "Body paragraphs, one per line"},
+    "mark": {"type": "text", "label": "Card background mark"},
+    "card_eyebrow": {"type": "text", "label": "Card eyebrow"},
+    "card_title": {"type": "text", "label": "Card title"},
+    "card_body": {"type": "textarea", "label": "Card body"},
+    "button": {"type": "text", "label": "Card link label"},
+    "button_url": {"type": "text", "label": "Card link URL"}
+  },
+  "presets": {
+    "eyebrow": "Our approach",
+    "title": "Independent advice, built around you",
+    "body": "Add the main introduction here.",
+    "mark": "G",
+    "card_eyebrow": "Our promise",
+    "card_title": "Personal service and clear value",
+    "card_body": "Add the supporting message here.",
+    "button": "Find out more",
+    "button_url": "/contact"
+  }
+}

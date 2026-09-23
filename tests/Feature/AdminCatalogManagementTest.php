@@ -418,6 +418,53 @@ class AdminCatalogManagementTest extends TestCase
         $this->assertFalse($customizer->hasDraft($page->customizer_template));
     }
 
+    public function test_about_page_is_rendered_and_editable_through_reusable_customizer_sections(): void
+    {
+        Storage::fake('local');
+        $this->seed();
+        $page = Page::where('slug', 'about')->firstOrFail();
+        $admin = $this->admin();
+
+        $this->assertSame('page-customizer/templates/about.json', $page->customizer_template);
+        $this->assertSame('AboutPage', $page->schema['@type']);
+
+        $this->get('/about')->assertOk()
+            ->assertSee('<title>About Us | Gani Property Services</title>', false)
+            ->assertSee('Independent advice, built around you')
+            ->assertSee('Property services under one roof')
+            ->assertSee('Clear communication at every step')
+            ->assertSee('At home in Balham and beyond')
+            ->assertSee('Thinking of selling, letting or investing?')
+            ->assertSee('data-customizer-section-id="hero"', false)
+            ->assertSee('data-customizer-section-id="coverage"', false)
+            ->assertSee('href="http://localhost/about" class="is-active"', false);
+
+        $this->get('/about-us')->assertNotFound();
+        $this->assertDatabaseMissing('pages', ['slug' => 'about-us']);
+        $this->assertDatabaseMissing('pages', ['slug' => 'about-static']);
+
+        $this->actingAs($admin)
+            ->get("/dashboard/pages/{$page->id}/customizer")
+            ->assertOk()
+            ->assertSee('Save draft')
+            ->assertSee('Publish');
+
+        $this->actingAs($admin)
+            ->get("/dashboard/pages/{$page->id}/customizer/schema")
+            ->assertOk()
+            ->assertJsonFragment(['id' => 'split-content-card'])
+            ->assertJsonFragment(['id' => 'tag-panel']);
+
+        $template = app(\App\Services\PageCustomizerService::class)->readTemplate($page->customizer_template);
+        $this->assertSame(['hero', 'intro', 'services', 'approach', 'coverage', 'cta'], $template['order']);
+        $this->assertSame('banner', $template['sections']['hero']['type']);
+        $this->assertSame('split-content-card', $template['sections']['intro']['type']);
+        $this->assertSame('card-grid', $template['sections']['services']['type']);
+        $this->assertSame('image-content', $template['sections']['approach']['type']);
+        $this->assertSame('tag-panel', $template['sections']['coverage']['type']);
+        $this->assertSame('cta-banner', $template['sections']['cta']['type']);
+    }
+
     public function test_customizer_draft_preview_requires_admin_authentication(): void
     {
         $this->seed();

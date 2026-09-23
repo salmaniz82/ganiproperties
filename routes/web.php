@@ -14,7 +14,7 @@ Route::get('/commercial/london/{area}/{rentPeriod?}', [StaticFrontendController:
 Route::get('/properties', fn () => redirect()->route('rent'))->name('properties');
 Route::get('/property/{slug}', [StaticFrontendController::class, 'property'])->name('property.show');
 Route::get('/landlords', [PageController::class, 'landlords'])->name('landlords');
-Route::get('/about-us', [StaticFrontendController::class, 'about'])->name('about');
+Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [StaticFrontendController::class, 'contact'])->name('contact');
 Route::get('/login', [AuthController::class,'show'])->name('login');
 Route::post('/login', [AuthController::class,'login'])->name('login.store');
