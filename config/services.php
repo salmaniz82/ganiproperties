@@ -22,6 +22,17 @@ return [
         'key' => env('RESEND_API_KEY'),
     ],
 
+    'mailchimp' => [
+        'app' => env('MAILCHIMP_APP', 'Gani Property Services'),
+        'key' => env('MAILCHIMP_API_KEY'),
+        'audience_id' => env('MAILCHIMP_AUDIENCE_ID'),
+        'ca_bundle' => env('MAILCHIMP_CA_BUNDLE'),
+    ],
+
+    'landlord_enquiry' => [
+        'to' => env('LANDLORD_ENQUIRY_EMAIL', 'hello@ganipropertyservices.co.uk'),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),

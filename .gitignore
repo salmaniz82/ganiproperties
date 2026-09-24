@@ -21,6 +21,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+/resources/certificates/cacert.pem
 _ide_helper.php
 Homestead.json
 Homestead.yaml

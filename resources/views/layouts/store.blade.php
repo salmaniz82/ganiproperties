@@ -23,6 +23,7 @@
         <symbol id="icon-key" viewBox="0 0 48 48"><circle cx="31" cy="15" r="9"/><path d="m25 21-19 19M12 34l5 5M17 29l5 5M30 15h2"/></symbol>
         <symbol id="icon-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></symbol>
         <symbol id="icon-instagram" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></symbol>
+        <symbol id="icon-whatsapp" viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 0 1-12.4 7.5L3 20.5l1.5-5.1A8.5 8.5 0 1 1 20.5 11.5Z"/><path d="M8.5 7.5c-.6.2-1.1 1.1-1.1 1.8 0 2.2 3.1 5.4 5.5 6.1.9.3 1.7.1 2.3-.4l.7-1.1-2.4-1.1-1.1 1c-1.4-.6-2.5-1.7-3.2-3.1l.9-1.1-1.1-2.1-.5.1Z"/></symbol>
         <symbol id="icon-facebook" viewBox="0 0 24 24"><path d="M14 8h4V3h-4c-4 0-6 2-6 6v3H4v5h4v4h5v-4h4l1-5h-5V9c0-.7.3-1 1-1Z"/></symbol>
     </svg>
 
@@ -34,8 +35,6 @@
         <nav class="desktop-nav" aria-label="Main navigation">
             <a href="{{ route('home') }}" @class(['is-active' => $activePage === 'home'])>Home</a>
             <a href="{{ route('rent') }}" @class(['is-active' => $activePage === 'rent'])>Rent</a>
-            <a href="{{ route('buy') }}" @class(['is-active' => $activePage === 'buy'])>Buy</a>
-            <a href="{{ route('commercial') }}" @class(['is-active' => $activePage === 'commercial'])>Commercial</a>
             <a href="{{ route('landlords') }}" @class(['is-active' => $activePage === 'landlords'])>Landlords</a>
             <a href="{{ route('about') }}" @class(['is-active' => $activePage === 'about'])>About</a>
             <a href="{{ route('contact') }}" @class(['is-active' => $activePage === 'contact'])>Contact</a>
@@ -49,8 +48,6 @@
         <nav class="mobile-nav" id="mobile-navigation" aria-label="Mobile navigation">
             <a href="{{ route('home') }}" @class(['is-active' => $activePage === 'home'])>Home</a>
             <a href="{{ route('rent') }}" @class(['is-active' => $activePage === 'rent'])>Rent</a>
-            <a href="{{ route('buy') }}" @class(['is-active' => $activePage === 'buy'])>Buy</a>
-            <a href="{{ route('commercial') }}" @class(['is-active' => $activePage === 'commercial'])>Commercial</a>
             <a href="{{ route('landlords') }}" @class(['is-active' => $activePage === 'landlords'])>Landlords</a>
             <a href="{{ route('about') }}" @class(['is-active' => $activePage === 'about'])>About</a>
             <a href="{{ route('contact') }}" @class(['is-active' => $activePage === 'contact'])>Contact</a>
@@ -67,14 +64,37 @@
         <div class="footer-brand">
             <a class="brand brand-inverse" href="{{ route('home') }}"><strong>GANI</strong><span>PROPERTY SERVICES</span></a>
             <p>Independent estate agents on Balham High Road, covering Balham, Tooting, Streatham and surrounding areas in South London.</p>
-            <div class="socials"><a href="#" aria-label="Instagram"><svg><use href="#icon-instagram"/></svg></a><a href="#" aria-label="Facebook"><svg><use href="#icon-facebook"/></svg></a><a href="#" class="google" aria-label="Google">G</a></div>
+            <div class="socials"><a href="https://www.instagram.com/ganipropertyservices/" aria-label="Gani Property Services on Instagram"><svg><use href="#icon-instagram"/></svg></a><a href="#" aria-label="Facebook"><svg><use href="#icon-facebook"/></svg></a><a href="#" class="google" aria-label="Google">G</a></div>
         </div>
         <div class="footer-column"><h3>Navigate</h3><a href="{{ route('rent') }}">Rent</a><a href="{{ route('buy') }}">Buy</a><a href="{{ route('commercial') }}">Commercial</a><a href="{{ route('landlords') }}">Landlords</a><a href="{{ route('pages.show', 'services') }}">Services</a><a href="{{ route('pages.show', 'events') }}">Events</a><a href="{{ route('about') }}">About</a><a href="{{ route('contact') }}">Contact</a></div>
-        <div class="footer-column"><h3>Helpful links</h3><a href="{{ route('contact') }}">Book a free valuation</a><a href="{{ route('rent') }}">Register for updates</a><a href="{{ route('about') }}#coverage">Area guides</a><a href="{{ route('pages.show', 'faq') }}">FAQ</a><a href="{{ route('pages.show', 'privacy-policy') }}">Privacy policy</a><a href="{{ route('pages.show', 'terms') }}">Terms &amp; conditions</a></div>
+        <div class="footer-column"><h3>Helpful links</h3><a href="{{ route('contact') }}">Book a free valuation</a><button class="footer-action" type="button" data-updates-open aria-haspopup="dialog" aria-controls="updates-dialog">Register for updates</button><a href="{{ route('about') }}#coverage">Area guides</a><a href="{{ route('pages.show', 'faq') }}">FAQ</a><a href="{{ route('pages.show', 'privacy-policy') }}">Privacy policy</a><a href="{{ route('pages.show', 'terms') }}">Terms &amp; conditions</a></div>
         <div class="footer-column"><h3>Contact</h3><p>142 Balham High Road<br>London SW12 9BW</p><a href="tel:02086737778">020 8673 7778</a><a href="mailto:hello@ganipropertyservices.co.uk">hello@ganipropertyservices.co.uk</a><p>Mon-Fri: 9am-6pm<br>Sat: 9am-4pm</p></div>
         <div class="copyright">&copy; GANI Property Services. All rights reserved <span id="year">{{ date('Y') }}</span></div>
     </footer>
 
+    <dialog class="updates-dialog" id="updates-dialog" aria-labelledby="updates-title">
+        <button class="updates-close" type="button" data-updates-close aria-label="Close registration form">&times;</button>
+        <div data-updates-form-content>
+            <p class="eyebrow">PROPERTY UPDATES</p>
+            <h2 id="updates-title">Register for updates</h2>
+            <p>Receive property news and updates from Gani Property Services.</p>
+            <form action="{{ route('updates.register') }}" method="post" data-updates-form>
+                @csrf
+                <label>Name<input name="name" type="text" autocomplete="name" maxlength="100" required></label>
+                <label>Email address<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+                <label>Phone number<input name="phone" type="tel" autocomplete="tel" maxlength="30" required></label>
+                <p class="updates-privacy">By registering, you agree to receive property updates by email. You can unsubscribe at any time. Read our <a href="{{ route('pages.show', 'privacy-policy') }}">privacy policy</a>.</p>
+                <p class="updates-feedback" data-updates-feedback role="alert" hidden></p>
+                <button class="button" type="submit">Register for updates</button>
+            </form>
+        </div>
+        <div class="updates-success" data-updates-success role="status" hidden>
+            <h2>Thank you</h2>
+            <p data-updates-success-message></p>
+        </div>
+    </dialog>
+
+    <a class="whatsapp-float" href="https://wa.me/447828454111" aria-label="Chat with Gani Property Services on WhatsApp" title="Chat on WhatsApp"><svg aria-hidden="true"><use href="#icon-whatsapp"/></svg></a>
     <div class="search-notice" role="status" aria-live="polite"></div>
     <script src="{{ asset('script.js') }}"></script>
 </body>

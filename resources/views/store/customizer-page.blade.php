@@ -16,4 +16,7 @@
 <div class="page-customizer-content">
     {!! isset($customizerTemplate) ? $customizer->renderTemplate($customizerTemplate) : $customizer->render($page->customizer_template) !!}
 </div>
+@if($page->slug === 'landlords')
+    @include('store.partials.landlord-enquiry')
+@endif
 @endsection

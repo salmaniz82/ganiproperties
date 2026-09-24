@@ -38,6 +38,70 @@
     });
   }
 
+  var updatesDialog = document.getElementById("updates-dialog");
+  var updatesOpener = document.querySelector("[data-updates-open]");
+  if (updatesDialog && updatesOpener) {
+    var updatesForm = updatesDialog.querySelector("[data-updates-form]");
+    var updatesFormContent = updatesDialog.querySelector("[data-updates-form-content]");
+    var updatesFeedback = updatesDialog.querySelector("[data-updates-feedback]");
+    var updatesSuccess = updatesDialog.querySelector("[data-updates-success]");
+    var updatesSuccessMessage = updatesDialog.querySelector("[data-updates-success-message]");
+    var updatesSubmit = updatesForm.querySelector('[type="submit"]');
+    var updatesCloseTimer;
+    var updatesSubmitting = false;
+
+    updatesOpener.addEventListener("click", function () { updatesDialog.showModal(); });
+    updatesDialog.querySelector("[data-updates-close]").addEventListener("click", function () { updatesDialog.close(); });
+    updatesDialog.addEventListener("click", function (event) {
+      if (event.target === updatesDialog) updatesDialog.close();
+    });
+    updatesDialog.addEventListener("close", function () {
+      window.clearTimeout(updatesCloseTimer);
+      updatesForm.reset();
+      updatesFeedback.hidden = true;
+      updatesFeedback.textContent = "";
+      updatesSuccess.hidden = true;
+      updatesFormContent.hidden = false;
+      updatesOpener.focus();
+    });
+
+    updatesForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      if (updatesSubmitting) return;
+      updatesSubmitting = true;
+      updatesSubmit.disabled = true;
+      updatesSubmit.textContent = "Registering...";
+      updatesFeedback.hidden = true;
+
+      try {
+        var response = await fetch(updatesForm.action, {
+          method: "POST",
+          body: new FormData(updatesForm),
+          headers: { "Accept": "application/json", "X-Requested-With": "XMLHttpRequest" }
+        });
+        var result = await response.json();
+        if (! response.ok) {
+          var fieldErrors = result.errors ? Object.values(result.errors) : [];
+          throw new Error(fieldErrors.length ? fieldErrors[0][0] : (result.message || "Registration failed. Please try again."));
+        }
+        if (!updatesDialog.open) return;
+        updatesSuccessMessage.textContent = result.message;
+        updatesFormContent.hidden = true;
+        updatesSuccess.hidden = false;
+        updatesCloseTimer = window.setTimeout(function () { updatesDialog.close(); }, 3200);
+      } catch (error) {
+        if (updatesDialog.open) {
+          updatesFeedback.textContent = error.message || "Registration failed. Please try again.";
+          updatesFeedback.hidden = false;
+        }
+      } finally {
+        updatesSubmitting = false;
+        updatesSubmit.disabled = false;
+        updatesSubmit.textContent = "Register for updates";
+      }
+    });
+  }
+
   document.querySelectorAll(".save-property").forEach(function (button) {
     button.addEventListener("click", function () {
       var isSaved = button.getAttribute("aria-pressed") === "true";
@@ -72,7 +136,18 @@
       });
     }
 
-    if (sectionSelect) sectionSelect.addEventListener("change", updateFilter);
+    if (sectionSelect) sectionSelect.addEventListener("change", function () {
+      var section = sectionSelect.value;
+      var currentSection = form.getAttribute("data-current-section");
+      if (currentSection !== "all" && section !== currentSection) {
+        var destination = form.getAttribute("data-" + section + "-url");
+        if (destination) {
+          window.location.assign(destination);
+          return;
+        }
+      }
+      updateFilter();
+    });
     form.addEventListener("submit", updateFilter);
     updateFilter();
   });

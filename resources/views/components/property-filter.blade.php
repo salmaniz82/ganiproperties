@@ -30,6 +30,7 @@
         action="{{ $action }}"
         method="get"
         data-property-filter
+        data-current-section="{{ $section }}"
         data-home-url="{{ route('home') }}"
         data-rent-url="{{ route('rent') }}"
         data-buy-url="{{ route('buy') }}"

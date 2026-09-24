@@ -17,4 +17,7 @@
         @endforeach
     </div>
 </section>
+@if($page->slug === 'landlords')
+    @include('store.partials.landlord-enquiry')
+@endif
 @endsection
