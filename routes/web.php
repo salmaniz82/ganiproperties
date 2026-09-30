@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\{AdminController, AdminMediaController, AdminPageController, AdminPageCustomizerController, AdminPropertyController, AuthController, LandlordEnquiryController, PageController, StaticFrontendController, UpdatesRegistrationController};
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TestEmailController;
 
 Route::get('/', [StaticFrontendController::class, 'home'])->name('home');
 Route::get('/rent', [StaticFrontendController::class, 'rent'])->name('rent');
@@ -21,6 +22,10 @@ Route::post('/updates/register', [UpdatesRegistrationController::class, 'store']
 Route::get('/login', [AuthController::class,'show'])->name('login');
 Route::post('/login', [AuthController::class,'login'])->name('login.store');
 Route::post('/logout', [AuthController::class,'logout'])->name('logout');
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/test-email', [TestEmailController::class, 'show'])->name('test-email');
+    Route::post('/test-email', [TestEmailController::class, 'send'])->middleware('throttle:1,1')->name('test-email.send');
+});
 Route::prefix('dashboard')->name('admin.')->middleware(['auth','admin'])->group(function () {
     Route::get('/', [AdminController::class,'dashboard'])->name('dashboard');
     Route::resource('properties', AdminPropertyController::class)->except('show');
