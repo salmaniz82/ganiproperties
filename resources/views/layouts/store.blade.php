@@ -8,7 +8,7 @@
     @yield('meta')
     @stack('structured-data')
     <title>@yield('title', 'Gani Property Services')</title>
-    <link rel="stylesheet" href="{{ asset('styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles.css') }}?v={{ filemtime(public_path('styles.css')) }}">
 </head>
 <body>
     <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -30,7 +30,7 @@
     @php($activePage = $activePage ?? '')
     <header class="site-header">
         <a class="brand" href="{{ route('home') }}" aria-label="Gani Property Services home">
-            <img class="brand-logo" src="{{ asset('images/Gani-Logo.svg') }}" alt="Gani Property Services">
+            <img class="brand-logo" src="{{ asset('images/gani-logo-original.png') }}" width="711" height="246" alt="Gani Property Services">
         </a>
         <nav class="desktop-nav" aria-label="Main navigation">
             <a href="{{ route('home') }}" @class(['is-active' => $activePage === 'home'])>Home</a>
@@ -63,7 +63,13 @@
     <footer class="footer" id="contact-footer">
         <div class="footer-brand">
             <a class="brand brand-inverse" href="{{ route('home') }}"><strong>GANI</strong><span>PROPERTY SERVICES</span></a>
-            <p>Independent estate agents on Balham High Road, covering Balham, Tooting, Streatham and surrounding areas in South London.</p>
+            <p>
+                <strong>Gani Property Services Ltd</strong><br>
+                Company number: 3514049<br><br>
+                We are members of the Property Redress Scheme and UKALA.<br>
+                Our client money protection is handled by Total Property.<br>
+                Our complaints procedure is available via WhatsApp, 24/7.
+            </p>
             <div class="socials"><a href="https://www.instagram.com/ganipropertyservices/" aria-label="Gani Property Services on Instagram"><svg><use href="#icon-instagram"/></svg></a><a href="#" aria-label="Facebook"><svg><use href="#icon-facebook"/></svg></a><a href="#" class="google" aria-label="Google">G</a></div>
         </div>
         <div class="footer-column"><h3>Navigate</h3><a href="{{ route('rent') }}">Rent</a><a href="{{ route('buy') }}">Buy</a><a href="{{ route('commercial') }}">Commercial</a><a href="{{ route('landlords') }}">Landlords</a><a href="{{ route('pages.show', 'services') }}">Services</a><a href="{{ route('pages.show', 'events') }}">Events</a><a href="{{ route('about') }}">About</a><a href="{{ route('contact') }}">Contact</a></div>

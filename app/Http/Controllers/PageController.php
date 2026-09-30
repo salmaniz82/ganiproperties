@@ -12,7 +12,11 @@ class PageController extends Controller
 
     public function about()
     {
+        
+        
+    
         return $this->show('about');
+        
     }
 
     public function show(string $slug)
