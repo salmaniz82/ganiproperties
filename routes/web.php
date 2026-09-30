@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\{AdminController, AdminMediaController, AdminPageController, AdminPageCustomizerController, AdminPropertyController, AuthController, LandlordEnquiryController, PageController, StaticFrontendController, UpdatesRegistrationController};
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ContactEnquiryController;
 use App\Http\Controllers\TestEmailController;
 
 Route::get('/', [StaticFrontendController::class, 'home'])->name('home');
@@ -18,6 +19,7 @@ Route::get('/landlords', [PageController::class, 'landlords'])->name('landlords'
 Route::post('/landlords/enquiry', [LandlordEnquiryController::class, 'store'])->middleware('throttle:5,1')->name('landlords.enquiry');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [StaticFrontendController::class, 'contact'])->name('contact');
+Route::post('/contact', [ContactEnquiryController::class, 'store'])->middleware('throttle:5,1')->name('contact.send');
 Route::post('/updates/register', [UpdatesRegistrationController::class, 'store'])->middleware('throttle:5,1')->name('updates.register');
 Route::get('/login', [AuthController::class,'show'])->name('login');
 Route::post('/login', [AuthController::class,'login'])->name('login.store');

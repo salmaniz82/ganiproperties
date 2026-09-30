@@ -33,6 +33,10 @@ return [
         'to' => env('LANDLORD_ENQUIRY_EMAIL', 'hello@ganipropertyservices.co.uk'),
     ],
 
+    'contact_enquiry' => [
+        'to' => env('CONTACT_ENQUIRY_EMAIL', 'hello@ganipropertyservices.co.uk'),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
