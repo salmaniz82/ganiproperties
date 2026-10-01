@@ -57,7 +57,7 @@
     </section>
 
     <section class="about section" id="about">
-        <div class="about-image"><img src="/assets/office-ref.jpg" alt="Gani independent estate agency on Balham High Road" loading="lazy"></div>
+        <div class="about-image"><img src="/assets/gani-office-client.webp" alt="Gani independent estate agency on Balham High Road" loading="lazy"></div>
         <div class="about-copy">
             <p class="eyebrow">OUR HOME. YOUR NEIGHBOURHOOD.</p>
             <h2>Proudly independent on<br>Balham High Road</h2>
