@@ -62,20 +62,20 @@
 
     <footer class="footer" id="contact-footer">
         <div class="footer-brand">
-            <a class="brand brand-inverse" href="{{ route('home') }}"><strong>GANI</strong><span>PROPERTY SERVICES</span></a>
+            <a class="brand" href="{{ route('home') }}" aria-label="Gani Property Services home">
+                <img class="footer-logo" src="{{ asset('images/gani-logo-original.png') }}" width="711" height="246" alt="Gani Property Services">
+            </a>
             <p>
                 <strong>Gani Property Services Ltd</strong><br>
                 Company number: 3514049<br><br>
-                We are members of the Property Redress Scheme and UKALA.<br>
-                Our client money protection is handled by Total Property.<br>
-                Our complaints procedure is available via WhatsApp, 24/7.
+                Our client money protection is handled by Total Property.
             </p>
             <div class="socials"><a href="https://www.instagram.com/ganipropertyservices/" aria-label="Gani Property Services on Instagram"><svg><use href="#icon-instagram"/></svg></a><a href="#" aria-label="Facebook"><svg><use href="#icon-facebook"/></svg></a><a href="#" class="google" aria-label="Google">G</a></div>
         </div>
         <div class="footer-column"><h3>Navigate</h3><a href="{{ route('rent') }}">Rent</a><a href="{{ route('buy') }}">Buy</a><a href="{{ route('commercial') }}">Commercial</a><a href="{{ route('landlords') }}">Landlords</a><a href="{{ route('pages.show', 'services') }}">Services</a><a href="{{ route('pages.show', 'events') }}">Events</a><a href="{{ route('about') }}">About</a><a href="{{ route('contact') }}">Contact</a></div>
         <div class="footer-column"><h3>Helpful links</h3><a href="{{ route('contact') }}">Book a free valuation</a><button class="footer-action" type="button" data-updates-open aria-haspopup="dialog" aria-controls="updates-dialog">Register for updates</button><a href="{{ route('about') }}#coverage">Area guides</a><a href="{{ route('pages.show', 'faq') }}">FAQ</a><a href="{{ route('pages.show', 'privacy-policy') }}">Privacy policy</a><a href="{{ route('pages.show', 'terms') }}">Terms &amp; conditions</a></div>
-        <div class="footer-column"><h3>Contact</h3><p>142 Balham High Road<br>London SW12 9BW</p><a href="tel:02086737778">020 8673 7778</a><a href="mailto:hello@ganipropertyservices.co.uk">hello@ganipropertyservices.co.uk</a><p>Mon-Fri: 9am-6pm<br>Sat: 9am-4pm</p></div>
-        <div class="copyright">&copy; GANI Property Services. All rights reserved <span id="year">{{ date('Y') }}</span></div>
+        <div class="footer-column"><h3>Contact</h3><p>142 Balham High Road<br>London SW12 9BW</p><a href="tel:02086737778">020 8673 7778</a><a href="mailto:hello@ganipropertyservices.co.uk">hello@ganipropertyservices.co.uk</a><p>Mon-Fri: 9am-6pm<br>Sat: 9am-4pm</p><p>Our complaints procedure is available via WhatsApp, 24/7.</p></div>
+        <div class="copyright"><span>&copy; GANI Property Services. All rights reserved <span id="year">{{ date('Y') }}</span></span><span>We are members of the Property Redress Scheme and UKALA.</span></div>
     </footer>
 
     <dialog class="updates-dialog" id="updates-dialog" aria-labelledby="updates-title">

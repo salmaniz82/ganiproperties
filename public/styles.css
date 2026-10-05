@@ -81,6 +81,7 @@ h1, h2 { font-family: "Plus Jakarta Sans", Arial, Helvetica, sans-serif; font-we
 .site-header .button:hover { background: #e9e7f7; }
 .button-outline { background: rgba(11, 12, 20, .52); border: 1px solid #fff; }
 .button-white { background: #fff; color: #272330; min-width: 220px; }
+.valuation .button-white:hover, .contact-valuation .button-white:hover { background: #e9e7f7; }
 
 .hero { min-height: 656px; position: relative; display: flex; align-items: center; color: #fff; background: url("assets/hero-balham.jpg") center / cover; }
 .hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(8, 10, 18, .84) 0%, rgba(8, 10, 18, .64) 43%, rgba(8, 10, 18, .12) 82%); }
@@ -182,7 +183,7 @@ h1, h2 { font-family: "Plus Jakarta Sans", Arial, Helvetica, sans-serif; font-we
 .phone { font-weight: 700; font-size: 14px; }
 
 .footer { background: var(--purple-dark); color: #d9d9df; display: grid; grid-template-columns: 1.5fr repeat(3, 1fr); column-gap: 68px; row-gap: 22px; padding: 44px max(32px, calc((100vw - 1320px) / 2)) 18px; }
-.brand-inverse { color: #fff; }
+.footer-logo { display: block; width: 145px; height: auto; max-width: 100%; }
 .footer h3 { color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 17px; }
 .footer-column { display: flex; flex-direction: column; align-items: flex-start; gap: 11px; font-size: 13px; line-height: 1.5; }
 .footer p { font-size: 13px; line-height: 1.7; margin-bottom: 5px; }
@@ -195,7 +196,8 @@ h1, h2 { font-family: "Plus Jakarta Sans", Arial, Helvetica, sans-serif; font-we
 .socials a { width: 29px; height: 29px; display: grid; place-items: center; border: 1px solid #77798b; border-radius: 50%; }
 .socials svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .socials .google { font-family: Georgia, serif; font-size: 14px; }
-.copyright { grid-column: 1 / -1; display: block; border-top: 1px solid #30344d; padding-top: 20px; font-size: 11px; line-height: 1.5; text-align: left; }
+.copyright { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid #30344d; padding-top: 20px; font-size: 11px; line-height: 1.5; }
+.copyright > span:last-child { text-align: center; }
 
 .updates-dialog { width: min(470px, calc(100% - 32px)); max-height: calc(100dvh - 32px); border: 0; border-radius: 10px; padding: 36px; color: var(--ink); box-shadow: 0 24px 70px rgba(12, 14, 32, .25); }
 .updates-dialog::backdrop { background: rgba(15, 17, 35, .68); }
@@ -272,7 +274,7 @@ h1, h2 { font-family: "Plus Jakarta Sans", Arial, Helvetica, sans-serif; font-we
   .valuation > div { margin: 0; }
   .footer { grid-template-columns: 1fr 1fr; gap: 38px 25px; padding: 42px 24px 24px; }
   .footer-brand { grid-column: 1 / -1; }
-  .copyright { text-align: left; }
+  .copyright { flex-wrap: wrap; }
   .footer .brand { width: max-content; }
   .updates-dialog { padding: 30px 22px; }
   .whatsapp-float { right: 16px; bottom: 16px; }
