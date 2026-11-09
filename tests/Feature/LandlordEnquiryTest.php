@@ -42,7 +42,7 @@ class LandlordEnquiryTest extends TestCase
             ->assertSessionHas('landlord_enquiry_sent');
 
         Mail::assertSent(LandlordEnquiry::class, function (LandlordEnquiry $mail) {
-            return $mail->hasTo('hello@ganipropertyservices.co.uk')
+            return $mail->hasTo('lettings@ganiproperties.co.uk')
                 && $mail->envelope()->replyTo[0]->address === 'aisha@example.com'
                 && $mail->details['address'] === "10 High Street\nLondon SW12 9BW";
         });

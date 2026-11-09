@@ -30,11 +30,11 @@ return [
     ],
 
     'landlord_enquiry' => [
-        'to' => env('LANDLORD_ENQUIRY_EMAIL', 'hello@ganipropertyservices.co.uk'),
+        'to' => env('LANDLORD_ENQUIRY_EMAIL', 'lettings@ganiproperties.co.uk'),
     ],
 
     'contact_enquiry' => [
-        'to' => env('CONTACT_ENQUIRY_EMAIL', 'hello@ganipropertyservices.co.uk'),
+        'to' => env('CONTACT_ENQUIRY_EMAIL', 'info@ganiproperties.co.uk'),
     ],
 
     'ses' => [

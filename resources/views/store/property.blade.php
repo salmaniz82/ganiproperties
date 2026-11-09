@@ -58,7 +58,7 @@
             <p class="eyebrow">INTERESTED IN THIS PROPERTY?</p><h2>Arrange a viewing</h2><p>Speak with our local team for availability, viewing times and any questions about the property.</p>
             <a class="button" href="{{ $contactUrl }}">Request a viewing</a>
             <a class="enquiry-phone" href="tel:02086737778"><svg class="icon"><use href="#icon-phone"/></svg><span><small>Call the team</small>020 8673 7778</span></a>
-            <a class="enquiry-email" href="mailto:hello@ganipropertyservices.co.uk?subject={{ rawurlencode('Enquiry about '.$property['title']) }}">Email this property</a>
+            <a class="enquiry-email" href="mailto:lettings@ganiproperties.co.uk?subject={{ rawurlencode('Enquiry about '.$property['title']) }}">Email this property</a>
             <div class="enquiry-actions"><button class="save-property" type="button" aria-pressed="false"><svg><use href="#icon-heart"/></svg> Save</button><button class="share-property" type="button" data-share-title="{{ $property['title'] }}"><svg><use href="#icon-chat"/></svg> Share</button></div>
         </aside>
     </section>

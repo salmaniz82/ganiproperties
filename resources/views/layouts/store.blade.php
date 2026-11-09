@@ -74,7 +74,16 @@
         </div>
         <div class="footer-column"><h3>Navigate</h3><a href="{{ route('rent') }}">Rent</a><a href="{{ route('buy') }}">Buy</a><a href="{{ route('commercial') }}">Commercial</a><a href="{{ route('landlords') }}">Landlords</a><a href="{{ route('pages.show', 'services') }}">Services</a><a href="{{ route('pages.show', 'events') }}">Events</a><a href="{{ route('about') }}">About</a><a href="{{ route('contact') }}">Contact</a></div>
         <div class="footer-column"><h3>Helpful links</h3><a href="{{ route('contact') }}">Book a free valuation</a><button class="footer-action" type="button" data-updates-open aria-haspopup="dialog" aria-controls="updates-dialog">Register for updates</button><a href="{{ route('about') }}#coverage">Area guides</a><a href="{{ route('pages.show', 'faq') }}">FAQ</a><a href="{{ route('pages.show', 'privacy-policy') }}">Privacy policy</a><a href="{{ route('pages.show', 'terms') }}">Terms &amp; conditions</a></div>
-        <div class="footer-column"><h3>Contact</h3><p>142 Balham High Road<br>London SW12 9BW</p><a href="tel:02086737778">020 8673 7778</a><a href="mailto:hello@ganipropertyservices.co.uk">hello@ganipropertyservices.co.uk</a><p>Mon-Fri: 9am-6pm<br>Sat: 9am-4pm</p><p>Our complaints procedure is available via WhatsApp, 24/7.</p></div>
+        <div class="footer-column">
+            <h3>Contact</h3>
+            <p>Balham High Rd<br>London SW12 9AG UK</p>
+            <a href="tel:02086737778">Tel: 020 8673 7778</a>
+            <p>Fax: 020 8673 7780</p>
+            <a href="mailto:lettings@ganiproperties.co.uk">lettings@ganiproperties.co.uk</a>
+            <a href="mailto:info@ganiproperties.co.uk">info@ganiproperties.co.uk</a>
+            <p>Working Hours<br>9AM - 6PM Monday - Friday<br>9AM - 1PM Saturday</p>
+            <p>Our complaints procedure is available via WhatsApp, 24/7.</p>
+        </div>
         <div class="copyright"><span>&copy; GANI Property Services. All rights reserved <span id="year">{{ date('Y') }}</span></span><span>We are members of the Property Redress Scheme and UKALA.</span></div>
     </footer>
 
